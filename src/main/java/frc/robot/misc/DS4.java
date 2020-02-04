@@ -15,6 +15,46 @@ import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 public class DS4 extends Joystick implements AutoCloseable {
+	public enum DSButton {
+		sq(1), x(2), o(3), tri(4), lb(5), rb(6), lt(7), rt(8), share(9), options(10), psBtn(13), povNone(-1, true),
+		povU(0, true), povUR(45, true), povR(90, true), povDR(135, true), povD(180, true), povDL(225, true),
+		povL(270, true), povUL(315, true);
+
+		private int id;
+		private boolean isPov = false;
+
+		private DSButton(int id) {
+			this.id = id;
+		}
+
+		private DSButton(int id, boolean isPov) {
+			this.id = id;
+			this.isPov = isPov;
+		}
+
+		public int getId() {
+			return id;
+		}
+
+		public boolean isPov() {
+			return isPov;
+		}
+	}
+
+	public enum DSAxis {
+		lx(0), ly(1), rx(2), rt(3), lt(4), ry(5);
+
+		private int id;
+
+		private DSAxis(int id) {
+			this.id = id;
+		}
+
+		public int getId() {
+			return id;
+		}
+	}
+
 	private double deadband = 0.02;
 	private EnumMap<DSButton, Button> buttons;
 
