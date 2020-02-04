@@ -9,8 +9,10 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import frc.robot.commands.drive.ArcadeDrive;
 import frc.robot.misc.DS4;
-import frc.robot.misc.DSButton;
+import frc.robot.misc.DS4.DSButton;
 import frc.robot.subsystems.Drivetrain;
 
 /**
@@ -29,10 +31,11 @@ public class RobotContainer {
     public static double BoostSpd = 1;
   }
 
-  // The robot's subsystems and commands are defined here...
-  public Drivetrain m_Drivetrain = new Drivetrain();
+  // Subsystems
+  private final Drivetrain m_Drivetrain = new Drivetrain();
 
-  public final DS4 driveController = new DS4(0);
+  // Sensors
+  private final DS4 m_driveController = new DS4(0);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -49,15 +52,18 @@ public class RobotContainer {
    * passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    driveController.getBtn(DSButton.psBtn).whenPressed(() -> Config.Inverted = !Config.Inverted);
 
-    driveController.getBtn(DSButton.lb)
-        .whenPressed(() -> m_Drivetrain.slow(true))
-        .whenReleased(() -> m_Drivetrain.slow(false));
+    // Configure Driver Controls
+    m_driveController.getBtn(DSButton.psBtn).whenPressed(new InstantCommand(() -> Config.Inverted = !Config.Inverted));
 
-    driveController.getBtn(DSButton.rb)
-        .whenPressed(() -> m_Drivetrain.boost(true))
-        .whenReleased(() -> m_Drivetrain.boost(false));
+    m_driveController.getBtn(DSButton.lt).whenPressed(new InstantCommand(() -> m_Drivetrain.slow(true), m_Drivetrain))
+        .whenReleased(new InstantCommand(() -> m_Drivetrain.slow(false), m_Drivetrain));
+
+    m_driveController.getBtn(DSButton.rt).whenPressed(new InstantCommand(() -> m_Drivetrain.boost(true), m_Drivetrain))
+        .whenReleased(new InstantCommand(() -> m_Drivetrain.boost(false), m_Drivetrain));
+
+    m_Drivetrain.setDefaultCommand(
+        new ArcadeDrive(() -> m_driveController.getY(), () -> m_driveController.getZ(), m_Drivetrain));
   }
 
   /**
@@ -66,7 +72,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // An ExampleCommand will run in autonomous
+    // Build Route
     return null;
   }
 }
