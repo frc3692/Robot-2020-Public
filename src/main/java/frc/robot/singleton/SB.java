@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
  */
 public class SB {
     public static class DriveDat {
-        private static DriveDat drive = new DriveDat();
+        private final static DriveDat drive = new DriveDat();
 
         private DriveDat() {
         }
@@ -30,33 +30,33 @@ public class SB {
             return drive;
         }
 
-        private static final ShuffleboardTab driveTab = Shuffleboard.getTab("Drive");
+        private final ShuffleboardTab driveTab = Shuffleboard.getTab("Drive");
 
-        private static final ShuffleboardLayout driveSpeeds = driveTab.getLayout("Drive Speeds", BuiltInLayouts.kList)
+        private final ShuffleboardLayout driveSpeeds = driveTab.getLayout("Drive Speeds", BuiltInLayouts.kList)
                 .withPosition(0, 0).withSize(1, 2);
-        private static final ShuffleboardLayout driveData = driveTab.getLayout("Misc Data", BuiltInLayouts.kList)
+        private final ShuffleboardLayout driveData = driveTab.getLayout("Misc Data", BuiltInLayouts.kList)
                 .withPosition(2, 0).withSize(1, 2);
-        private static final ShuffleboardLayout driveAmps = driveTab.getLayout("Amperage", BuiltInLayouts.kGrid)
+        private final ShuffleboardLayout driveAmps = driveTab.getLayout("Amperage", BuiltInLayouts.kGrid)
                 .withPosition(0, 2).withSize(3, 4);
 
-        private static final NetworkTableEntry Slow = driveSpeeds.addPersistent("Slow Speed", 0.5).getEntry();
-        private static final NetworkTableEntry Normal = driveSpeeds.addPersistent("Normal Speed", 0.75).getEntry();
-        private static final NetworkTableEntry Boost = driveSpeeds.addPersistent("Boost Speed", 1).getEntry();
+        private final NetworkTableEntry Slow = driveSpeeds.addPersistent("Slow Speed", 0.5).getEntry();
+        private final NetworkTableEntry Normal = driveSpeeds.addPersistent("Normal Speed", 0.75).getEntry();
+        private final NetworkTableEntry Boost = driveSpeeds.addPersistent("Boost Speed", 1).getEntry();
 
-        private static final NetworkTableEntry Mult = driveData.addPersistent("Mult", 0.75)
+        private final NetworkTableEntry Mult = driveData.addPersistent("Mult", 0.75)
                 .withWidget(BuiltInWidgets.kNumberBar).withProperties(Map.of("min", 0, "max", 1)).getEntry();
-        private static final NetworkTableEntry Boosted = driveData.addPersistent("Boosted", false)
+        private final NetworkTableEntry Boosted = driveData.addPersistent("Boosted", false)
                 .withWidget(BuiltInWidgets.kBooleanBox).getEntry();
-        private static final NetworkTableEntry Slowed = driveData.addPersistent("Slowed", false)
+        private final NetworkTableEntry Slowed = driveData.addPersistent("Slowed", false)
                 .withWidget(BuiltInWidgets.kBooleanBox).getEntry();
 
-        private static final NetworkTableEntry FLAmperage = driveAmps.addPersistent("FL Amp Draw", 0)
+        private final NetworkTableEntry FLAmperage = driveAmps.addPersistent("FL Amp Draw", 0)
                 .withWidget(BuiltInWidgets.kGraph).withPosition(0, 0).getEntry();
-        private static final NetworkTableEntry FRAmperage = driveAmps.addPersistent("FR Amp Draw", 0)
+        private final NetworkTableEntry FRAmperage = driveAmps.addPersistent("FR Amp Draw", 0)
                 .withWidget(BuiltInWidgets.kGraph).withPosition(1, 0).getEntry();
-        private static final NetworkTableEntry BLAmperage = driveAmps.addPersistent("BL Amp Draw", 0)
+        private final NetworkTableEntry BLAmperage = driveAmps.addPersistent("BL Amp Draw", 0)
                 .withWidget(BuiltInWidgets.kGraph).withPosition(0, 1).getEntry();
-        private static final NetworkTableEntry BRAmperage = driveAmps.addPersistent("BR Amp Draw", 0)
+        private final NetworkTableEntry BRAmperage = driveAmps.addPersistent("BR Amp Draw", 0)
                 .withWidget(BuiltInWidgets.kGraph).withPosition(1, 1).getEntry();
 
         public double getSlowSpeed() {
@@ -94,7 +94,7 @@ public class SB {
             return lighting;
         }
 
-        private static final ShuffleboardTab lightingTab = Shuffleboard.getTab("Lighting");
+        private final ShuffleboardTab lightingTab = Shuffleboard.getTab("Lighting");
         private final NetworkTableEntry Mode = lightingTab.addPersistent("Mode", 1).getEntry();
         private final NetworkTableEntry Freeze = lightingTab.addPersistent("Freeze Mode", false).getEntry();
 

@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.SPI;
  * Add your docs here.
  */
 public class Gyro {
-    private static Gyro gyro = new Gyro();
+    private final static Gyro gyro = new Gyro();
     private final AHRS m_ahrs = new AHRS(SPI.Port.kMXP);
 
     public static Gyro getInstance() {

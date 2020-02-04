@@ -35,8 +35,8 @@ public class Drivetrain extends SubsystemBase {
 
   private final DifferentialDrive m_drive = new DifferentialDrive(m_frontLeft, m_frontRight);
 
-  private final CANEncoder m_leftEncoder = m_frontLeft.getAlternateEncoder(AlternateEncoderType.kQuadrature, 8192);
-  private final CANEncoder m_rightEncoder = m_frontRight.getAlternateEncoder(AlternateEncoderType.kQuadrature, 8192);
+  private final CANEncoder m_leftEncoder = m_frontLeft.getAlternateEncoder(AlternateEncoderType.kQuadrature, DriveConstants.kEncCPR);
+  private final CANEncoder m_rightEncoder = m_frontRight.getAlternateEncoder(AlternateEncoderType.kQuadrature, DriveConstants.kEncCPR);
 
   private final DifferentialDriveOdometry m_odometry = new DifferentialDriveOdometry(
       Rotation2d.fromDegrees(Gyro.getInstance().getHeading()));
