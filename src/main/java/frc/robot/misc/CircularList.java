@@ -11,9 +11,9 @@ import java.util.ArrayList;
 
 public class CircularList<E> extends ArrayList<E> {
 	private static final long serialVersionUID = -4581372177688077093L;
-	
+
 	private int index = 0;
-	
+
 	@SafeVarargs
 	public CircularList(E... initVals) {
 		super();
