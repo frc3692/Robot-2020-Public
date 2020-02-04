@@ -27,8 +27,8 @@ public final class Constants {
         public static final int kFrontRight = 3;
         public static final int kBackRight = 4;
 
-        // Assuming it's the wheel Circumference
         public static final double kWheelCirc = 0.1524 * Math.PI;
+        public static final int kEncCPR = 8192;
 
         // Auto
         // TODO: Get constants from frc robot characterization tool
@@ -36,7 +36,7 @@ public final class Constants {
         public static final double ksVoltSecondsPerMeter = 0;
         public static final double kaVoltSecondsSquaredPerMeter = 0;
 
-        public static final double KPDriveVel = 0;
+        public static final double kPDriveVel = 0;
 
         public static final double kTrackWidthMeters = 0;
         public static final DifferentialDriveKinematics kDriveConstants = new DifferentialDriveKinematics(
@@ -48,7 +48,21 @@ public final class Constants {
         public static final double kRamseteZeta = 0.7;
     }
 
-    public static final class Misc {
+    public static final class MechanismConstants {
+        public static final int kAngle = 5;
+        public static final double kAngleSpeed = 0.5;
+        public static final double kAngleTopSpeed = 0.75;
+
+        public static final int kIntake = 9;
+        public static final double kIntakeSpeed = 1;
+
+        public static final int kColorLift = 6;
+        public static final int kColorSpinner = 7;
+
+        public static final int kRobotLift = 8;
+    }
+
+    public static final class MiscConstants {
         public static final int kBlinkinPort = 0;
     }
 }
