@@ -36,6 +36,7 @@ public class RobotContainer {
 
   // Sensors
   private final DS4 m_driveController = new DS4(0);
+  private final DS4 m_mechanismController = new DS4(1);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -43,6 +44,10 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
+
+    // Set up subsystems
+    m_Drivetrain.setDefaultCommand(
+      new ArcadeDrive(() -> m_driveController.getY(), () -> m_driveController.getZ(), m_Drivetrain));
   }
 
   /**
@@ -61,9 +66,6 @@ public class RobotContainer {
 
     m_driveController.getBtn(DSButton.rt).whenPressed(new InstantCommand(() -> m_Drivetrain.boost(true), m_Drivetrain))
         .whenReleased(new InstantCommand(() -> m_Drivetrain.boost(false), m_Drivetrain));
-
-    m_Drivetrain.setDefaultCommand(
-        new ArcadeDrive(() -> m_driveController.getY(), () -> m_driveController.getZ(), m_Drivetrain));
   }
 
   /**
