@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package frc.robot.misc;
+package frc.robot.util;
 
 import java.util.EnumMap;
 

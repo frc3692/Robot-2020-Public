@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package frc.robot.misc.pneumatics;
+package frc.robot.util.pneumatics;
 
 import edu.wpi.first.wpilibj.SolenoidBase;
 

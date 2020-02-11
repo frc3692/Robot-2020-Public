@@ -5,29 +5,23 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package frc.robot.misc.pneumatics;
+package frc.robot.util.pneumatics;
 
-import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
+import edu.wpi.first.wpilibj.Solenoid;
 
-public enum SolState {
-	open, closed;
+public class SingleWrapper extends SolWrapper {
+	Solenoid base;
 
-	public static SolState get(Value v) {
-		switch (v) {
-		case kForward:
-			return SolState.open;
-		case kReverse:
-			return SolState.closed;
-		default:
-			return null;
-		}
+	public SingleWrapper(int id) {
+		this.base = new Solenoid(id);
+		base.set(false);
+
+		set(SolState.closed);
+		setBase(base);
 	}
 
-	public static SolState get(boolean b) {
-		return (b) ? SolState.open : SolState.closed;
-	}
-
-	public SolState invert() {
-		return ((this == SolState.closed) ? SolState.open : SolState.closed);
+	public void set(SolState state) {
+		setState(state);
+		base.set((state == SolState.open) ? true : false);
 	}
 }
