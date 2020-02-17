@@ -50,6 +50,13 @@ public class SB {
             "Feeder Station Wall"
         },
         routines = {
+            "Steal 2 & Score 15",
+            "Steal All & Score 15",
+            "Score Trench & Generator Switch",
+            "Steal All & Score Trench",
+            "Steal All & Score Generator Switch",
+            "Score Trench",
+
             "Score and Run",
             "Score Wide and Run",
             "Run Only",
@@ -62,19 +69,26 @@ public class SB {
             }
             Debug.log("Auto");
             positionChooser.addOption("Power Port Wall", 0);
-            positionChooser.setDefaultOption("Power Port", 1);
+            positionChooser.addOption("Power Port", 1);
             positionChooser.addOption("Center", 2);
             positionChooser.addOption("Feeder Station", 3);
-            positionChooser.addOption("Feeder Station Wall", 4);
+            positionChooser.setDefaultOption("Feeder Station Wall", 4);
             
-            routineChooser.setDefaultOption("Score and Run", 0);
-            routineChooser.addOption("Score Wide and Run", 1);
-            routineChooser.addOption("Run Only", 2);
-            routineChooser.addOption("Everybot", 3);
-            routineChooser.addOption("Spin (This auto is a joke, do not choose it unless you don't want to score any points)", 4); // I'm leaving this in
+            routineChooser.setDefaultOption("Steal 2, Score Trench, and Generator Switch (15 Balls) (Feeder Station Only)", 0);
+            routineChooser.addOption("Steal Trench, Score Trench, and Generator Switch (15 Balls) (Feeder Station Only & No Preload)", 1);
+            routineChooser.addOption("Score Trench and Generator Switch (13 Balls) ", 2);
+            routineChooser.addOption("Steal Trench and Score Generator Switch (10 Balls) (No Preload)", 3);
+            routineChooser.addOption("Steal Trench and Score Trench (10 Balls) (No Preload)", 5);
+            routineChooser.addOption("Score Trench (8 Balls)", 4);
+            routineChooser.addOption("Score Generator Switch (8 Balls)", 6);
+            routineChooser.addOption("Steal Trench (5 Balls) (No Preload)", 7);
+            routineChooser.addOption("Score and Run (3 Balls)", 8);
+            routineChooser.addOption("Score Wide and Run (3 Balls)", 9);
+            routineChooser.addOption("Run Only (0 Balls) (No Preload)", 10);
+            routineChooser.addOption("Everybot (0 Balls)", 11);
+            routineChooser.addOption("Spin (This auto is a joke, do not choose it unless you don't want to score any points)", 12); // I'm leaving this in
 
             autoChooserList.add(positionChooser);
-            autoChooserList.add(routineChooser);
         }
 
         public int getStartingPosition() {
