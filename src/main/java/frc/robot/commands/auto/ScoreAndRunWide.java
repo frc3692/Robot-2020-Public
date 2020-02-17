@@ -8,15 +8,15 @@
 package frc.robot.commands.auto;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.RamseteController;
+import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.robot.Constants.ArmConstants;
-import frc.robot.commands.auto.ramsete.ScoreRun;
-import frc.robot.commands.auto.ramsete.ScoreTurn;
+import frc.robot.Constants.DriveConstants;
 import frc.robot.singleton.Trajectories;
 import frc.robot.singleton.SB;
 import frc.robot.subsystems.Arm;
@@ -24,47 +24,67 @@ import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Intake;
 
 public class ScoreAndRunWide extends CommandBase {
-  private Command autonCommand;
-  public ScoreAndRunWide(int startingPos, RamseteController controller, Drivetrain dt, Intake intake, Arm arm) {
-    Trajectories auto = Trajectories.getInstance();
+  private Command m_autonCommand;
+  private RamseteController m_controller;
+  private Drivetrain m_dt;
 
-    Command angleArmScore = new RunCommand(() -> arm.set(1), arm);
-    Command scoreAndRun = new RunCommand(() -> intake.out(), intake).withTimeout(1)
-        .andThen(new ScoreTurn(controller, dt))
-        .alongWith(
-            new WaitCommand(.5).andThen(new RunCommand(() -> arm.set(-1), arm)))
-        .andThen(new ScoreRun(controller, dt)).raceWith(new RunCommand(() -> intake.in(), intake));
+  public ScoreAndRunWide(int startingPos, RamseteController controller, Drivetrain dt, Intake intake, Arm arm) {
+    Trajectories trajectories = Trajectories.getInstance();
+
+    Command angleArmDown = new RunCommand(() -> arm.set(1), arm);
+    Command scoreAndRun = new RunCommand(() -> arm.set(-1), arm).withTimeout(0.5)
+        .andThen(new RunCommand(() -> intake.out(), intake).withTimeout(1)).andThen(ramseteFromTrajectory(trajectories.getScoreRun()))
+        .andThen(ramseteFromTrajectory(trajectories.getScoreRun()).raceWith(new RunCommand(() -> intake.in(), intake)));
 
     Command wait1 = new WaitCommand(SB.AutonDat.getInstance().getWait1());
     switch (startingPos) {
-    case 0:
-      autonCommand = wait1;
-      break;
-    case 1:
+      case 0:
+        // Power Port Wall
+        m_autonCommand = wait1
+            .andThen(ramseteFromTrajectory(trajectories.getPowerPortWallScoreWide()).alongWith(angleArmDown))
+            .andThen(scoreAndRun);
+        break;
+      case 1:
+        // Power Port
+        m_autonCommand = wait1.andThen(ramseteFromTrajectory(trajectories.getPowerPortScore()).alongWith(angleArmDown))
+            .andThen(scoreAndRun);
+        break;
+      case 2:
+        // Center
+        m_autonCommand = wait1.andThen(ramseteFromTrajectory(trajectories.getCenterScoreWide()).alongWith(angleArmDown))
+            .andThen(scoreAndRun);
+        break;
+      case 3:
+        // Feeder Station
+        m_autonCommand = wait1
+            .andThen(ramseteFromTrajectory(trajectories.getFeederStationScoreWide()).alongWith(angleArmDown))
+            .andThen(scoreAndRun);
+        break;
+      case 4:
+        // Feeder Station Wall
+        m_autonCommand = wait1
+            .andThen(ramseteFromTrajectory(trajectories.getFeederStationWallScoreWide()).alongWith(angleArmDown))
+            .andThen(scoreAndRun);
+        break;
+      default:
+        DriverStation.reportError("Error - Invalid Starting Position", true);
+      }
+  }
 
-      break;
-    case 2:
-
-      break;
-    case 3:
-
-      break;
-    case 4:
-
-      break;
-    default:
-      DriverStation.reportError("Error - Invalid Starting Position", true);
-    }
+  private RamseteCommand ramseteFromTrajectory(Trajectory trajectory) {
+    return new RamseteCommand(trajectory, m_dt::getPose, m_controller, DriveConstants.kFeedForward,
+        DriveConstants.kDriveConstants, m_dt::getWheelSpeeds, new PIDController(DriveConstants.kPDriveVel, 0, 0),
+        new PIDController(DriveConstants.kPDriveVel, 0, 0), m_dt::voltageDrive, m_dt);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    autonCommand.schedule();
+    m_autonCommand.schedule();
   }
 
   @Override
   public boolean isFinished() {
-    return autonCommand.isFinished();
+    return m_autonCommand.isFinished();
   }
 }
