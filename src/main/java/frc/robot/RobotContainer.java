@@ -13,17 +13,18 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import frc.robot.Constants.DriveConstants;
-import frc.robot.commands.arm.ArmLoop;
 import frc.robot.commands.auto.DriveDistance;
 import frc.robot.commands.auto.ScoreAndRun;
 import frc.robot.commands.auto.ScoreAndRunWide;
+import frc.robot.commands.colorwheel.ColorLoop;
 import frc.robot.commands.drive.ArcadeDrive;
 import frc.robot.commands.intake.IntakeLoop;
 import frc.robot.singleton.SB;
 import frc.robot.util.DS4;
+import frc.robot.util.DS4.DSAxis;
 import frc.robot.util.DS4.DSButton;
 import frc.robot.subsystems.Arm;
-import frc.robot.subsystems.Climber;
+import frc.robot.subsystems.Lift;
 import frc.robot.subsystems.ColorWheelActuator;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Intake;
@@ -47,7 +48,7 @@ public class RobotContainer {
   // Subsystems
   private final Arm m_arm = new Arm();
   private final Intake m_intake = new Intake();
-  private final Climber m_climber = new Climber();
+  private final Lift m_lift = new Lift();
   private final Drivetrain m_drivetrain = new Drivetrain();
   private final ColorWheelActuator m_colorWheelActuator = new ColorWheelActuator();
 
@@ -61,18 +62,6 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
-
-    // Set up subsystems
-    m_drivetrain.setDefaultCommand(
-        new ArcadeDrive(() -> m_driveController.getY(), () -> m_driveController.getZ(), m_drivetrain));
-
-    // m_colorWheelActuator.setDefaultCommand(new ColorLoop(() ->
-    // m_mechanismController.getY(true),
-    // () -> m_mechanismController.getZ(true), m_colorWheelActuator));
-
-    m_arm.setDefaultCommand(new ArmLoop(() -> m_mechanismController.getY(true), m_arm));
-
-    m_intake.setDefaultCommand(new IntakeLoop(() -> m_mechanismController.getNetTriggers(), m_intake));
   }
 
   /**
@@ -82,19 +71,37 @@ public class RobotContainer {
    * passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-
     // Configure Driver Controls
-    m_driveController.getBtn(DSButton.psBtn).whenPressed(new InstantCommand(() -> Config.Inverted = !Config.Inverted));
+    // Configure Axis
+    m_drivetrain.setDefaultCommand(
+        new ArcadeDrive(() -> m_driveController.getY(), () -> m_driveController.getZ(), m_drivetrain));
 
+    // Configure buttons
     m_driveController.getBtn(DSButton.lt).whenPressed(new InstantCommand(() -> m_drivetrain.slow(true), m_drivetrain))
         .whenReleased(new InstantCommand(() -> m_drivetrain.slow(false), m_drivetrain));
 
     m_driveController.getBtn(DSButton.rt).whenPressed(new InstantCommand(() -> m_drivetrain.boost(true), m_drivetrain))
         .whenReleased(new InstantCommand(() -> m_drivetrain.boost(false), m_drivetrain));
 
-    // Configure Mechanism Controls
-    m_mechanismController.getBtn(DSButton.povU).whenPressed(new RunCommand(() -> m_arm.set(1)));
-    m_mechanismController.getBtn(DSButton.povD).whenPressed(new RunCommand(() -> m_arm.set(-1)));
+    m_driveController.getBtn(DSButton.psBtn).whenPressed(new InstantCommand(() -> Config.Inverted = !Config.Inverted));
+
+    // Configure Color Wheel Controls
+    // Configure Axis
+    m_colorWheelActuator.setDefaultCommand(new ColorLoop(() -> m_mechanismController.getY(true),
+        () -> m_mechanismController.getRawAxis(DSAxis.ry, true), m_colorWheelActuator));
+
+    // Configure Intake
+    // Configure Axis
+    m_intake.setDefaultCommand(new IntakeLoop(() -> m_mechanismController.getNetTriggers(), m_intake));
+
+    // Configure Arm
+    // Configure Buttons
+    m_mechanismController.getBtn(DSButton.povU).whenPressed(new RunCommand(() -> m_arm.set(1))); // Up
+    m_mechanismController.getBtn(DSButton.povD).whenPressed(new RunCommand(() -> m_arm.set(-1))); // Down
+
+    // Configure Lift
+    // Configure Buttons
+    m_mechanismController.getBtn(DSButton.psBtn).whenPressed(new InstantCommand(() -> m_lift.release(m_arm), m_lift, m_arm));
 
   }
 
@@ -110,16 +117,19 @@ public class RobotContainer {
     switch (SB.AutonDat.getInstance().getRoutine()) {
     case 0:
       // Score and Run
-      autonCommand = new ScoreAndRun(SB.AutonDat.getInstance().getStartingPosition(), controller, m_drivetrain, m_intake, m_arm);
+      autonCommand = new ScoreAndRun(SB.AutonDat.getInstance().getStartingPosition(), controller, m_drivetrain,
+          m_intake, m_arm);
       break;
     case 1:
       // Score and Run Wide]
-      autonCommand = new ScoreAndRunWide(SB.AutonDat.getInstance().getStartingPosition(), controller, m_drivetrain, m_intake, m_arm);
+      autonCommand = new ScoreAndRunWide(SB.AutonDat.getInstance().getStartingPosition(), controller, m_drivetrain,
+          m_intake, m_arm);
     }
-    if(autonCommand != null)
-      if(SB.AutonDat.getInstance().getPushing())
-        autonCommand = new DriveDistance(-DriveConstants.kFrameLength/2, m_drivetrain).andThen(autonCommand);
-      autonCommand = autonCommand.withInterrupt(() -> m_driveController.getRawButton(DSButton.o) || m_mechanismController.getRawButton(DSButton.o));
+    if (autonCommand != null)
+      if (SB.AutonDat.getInstance().getPushing())
+        autonCommand = new DriveDistance(-DriveConstants.kFrameLength / 2, m_drivetrain).andThen(autonCommand);
+    autonCommand = autonCommand.withInterrupt(
+        () -> m_driveController.getRawButton(DSButton.o) || m_mechanismController.getRawButton(DSButton.o));
     return null;
   }
 
