@@ -7,6 +7,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 
 /**
@@ -22,15 +23,33 @@ import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 public final class Constants {
     // Drivetrain constants
     public static final class DriveConstants {
+        // Electrical
         public static final int kFrontLeft = 1;
         public static final int kBackLeft = 2;
         public static final int kFrontRight = 3;
         public static final int kBackRight = 4;
 
-        public static final double kWheelCirc = 0.1524 * Math.PI;
-        public static final int kEncCPR = 8192;
+        // Mechanical
+        /** Wheel circumference in meters */
+        public static final double kWheelCirc = 0.1524 /* 6 in */ * Math.PI;
+        /** Gear ratio of the toughbox mini */
+        public static final double kGearRatio = 12.75;
+        /** Frame width in meters (includes bumpers) */
+        public static final double kFrameWidth = 0.9144; // 36 in
+        /** Frame length in meters (includes bumpers) */
+        public static final double kFrameLength = 0.94615;
+        /** Wheelbase in meters */
+        public static final double kTrackWidth = 0.6096;
+
+        // PID
+        /** Encoder distance per revolution */
+        public static final double kEncDPR = kWheelCirc / kGearRatio;
 
         // Auto
+        // TODO: Find max accel and vel
+        public static final double kMaxAccel = 6;
+        public static final double kMaxVel = 3;
+
         // TODO: Get constants from frc robot characterization tool
         public static final double ksVolts = 0;
         public static final double ksVoltSecondsPerMeter = 0;
@@ -38,9 +57,9 @@ public final class Constants {
 
         public static final double kPDriveVel = 0;
 
-        public static final double kTrackWidthMeters = 0;
-        public static final DifferentialDriveKinematics kDriveConstants = new DifferentialDriveKinematics(
-                kTrackWidthMeters);
+        public static final DifferentialDriveKinematics kDriveConstants = new DifferentialDriveKinematics(kTrackWidth);
+        public static final SimpleMotorFeedforward kFeedForward = new SimpleMotorFeedforward(ksVolts,
+                ksVoltSecondsPerMeter, kaVoltSecondsSquaredPerMeter);
 
         // Reasonable baseline values for a RAMSETE follower in units of meters and
         // seconds
@@ -48,18 +67,45 @@ public final class Constants {
         public static final double kRamseteZeta = 0.7;
     }
 
-    public static final class MechanismConstants {
-        public static final int kAngle = 5;
-        public static final double kAngleSpeed = 0.5;
-        public static final double kAngleTopSpeed = 0.75;
+    public static final class ArmConstants {
+        public static final int kMotor = 5;
 
-        public static final int kIntake = 9;
-        public static final double kIntakeSpeed = 1;
+        public static final int kGearRatio = 36;
 
-        public static final int kColorLift = 6;
-        public static final int kColorSpinner = 7;
+        public static final int kEnc = 0;
+        /** Encoder counts per revolution */
+        public static final int kEncCPR = 8192;
 
-        public static final int kRobotLift = 8;
+        // PID
+        // TODO: Characterize Arm
+        public static final double kPVel = 0;
+        public static final double ksVolts = 0;
+        public static final double kMaxVel = 0;
+        public static final double kMaxAccel = 0;
+
+        // TODO: Get encoder positions
+        public static final double retractedAngle = 0;
+        public static final double kScoreAngle = 0.18;
+        public static final double kForwardAngle = 0.6;
+    }
+
+    public static final class IntakeConstants {
+        public static final int kMotor = 9;
+        public static final double kSpeed = 1;
+        public static final double kTopSpeed = 1;
+    }
+
+    public static final class ColorWheelConstants {
+        public static final int kLiftMotor = 6;
+        public static final int kWheelMotor = 7;
+
+        /** Max motor speed in RPM */
+        public static final int kWheelSpeed = 3200;
+    }
+
+    public static final class LiftConstants {
+        public static final int kHookMotor = 8;
+        public static final int kReleaseServo = 1;
     }
 
     public static final class MiscConstants {
