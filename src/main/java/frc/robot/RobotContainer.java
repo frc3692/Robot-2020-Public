@@ -11,8 +11,10 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.controller.RamseteController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.commands.arm.ArmLoop;
+import frc.robot.commands.auto.DriveDistance;
 import frc.robot.commands.auto.ScoreAndRun;
 import frc.robot.commands.auto.ScoreAndRunWide;
 import frc.robot.commands.drive.ArcadeDrive;
@@ -89,6 +91,11 @@ public class RobotContainer {
 
     m_driveController.getBtn(DSButton.rt).whenPressed(new InstantCommand(() -> m_drivetrain.boost(true), m_drivetrain))
         .whenReleased(new InstantCommand(() -> m_drivetrain.boost(false), m_drivetrain));
+
+    // Configure Mechanism Controls
+    m_mechanismController.getBtn(DSButton.povU).whenPressed(new RunCommand(() -> m_arm.set(1)));
+    m_mechanismController.getBtn(DSButton.povD).whenPressed(new RunCommand(() -> m_arm.set(-1)));
+
   }
 
   /**
@@ -110,6 +117,8 @@ public class RobotContainer {
       autonCommand = new ScoreAndRunWide(SB.AutonDat.getInstance().getStartingPosition(), controller, m_drivetrain, m_intake, m_arm);
     }
     if(autonCommand != null)
+      if(SB.AutonDat.getInstance().getPushing())
+        autonCommand = new DriveDistance(-DriveConstants.kFrameLength/2, m_drivetrain).andThen(autonCommand);
       autonCommand = autonCommand.withInterrupt(() -> m_driveController.getRawButton(DSButton.o) || m_mechanismController.getRawButton(DSButton.o));
     return null;
   }

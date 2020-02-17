@@ -29,7 +29,7 @@ public class Trajectories {
         return commands;
     }
 
-    private Trajectory S1, S2, S3, S4, S5, S1W, S3W, S4W, S5W, ST, SR;
+    private Trajectory S1, S2, S3, S4, S5, S1W, S2W, S3W, S4W, ST, SR;
 
     private Trajectories() {
         try {
@@ -65,6 +65,24 @@ public class Trajectories {
         try {
             S1W = TrajectoryUtil.fromPathweaverJson(
                     Filesystem.getDeployDirectory().toPath().resolve("paths\\SW1 PPW.wpilib.json"));
+        } catch (IOException e) {
+            DriverStation.reportError(e.getMessage(), e.getStackTrace());
+        }
+        try {
+            S2W = TrajectoryUtil.fromPathweaverJson(
+                    Filesystem.getDeployDirectory().toPath().resolve("paths\\SW2 C.wpilib.json"));
+        } catch (IOException e) {
+            DriverStation.reportError(e.getMessage(), e.getStackTrace());
+        }
+        try {
+            S3W = TrajectoryUtil.fromPathweaverJson(
+                    Filesystem.getDeployDirectory().toPath().resolve("paths\\SW3 FS.wpilib.json"));
+        } catch (IOException e) {
+            DriverStation.reportError(e.getMessage(), e.getStackTrace());
+        }
+        try {
+            S4W = TrajectoryUtil.fromPathweaverJson(
+                    Filesystem.getDeployDirectory().toPath().resolve("paths\\SW4 FSW.wpilib.json"));
         } catch (IOException e) {
             DriverStation.reportError(e.getMessage(), e.getStackTrace());
         }
@@ -122,5 +140,17 @@ public class Trajectories {
 
     public Trajectory getPowerPortWallScoreWide() {
         return S1W;
+    }
+
+    public Trajectory getCenterScoreWide() {
+        return S2W;
+    }
+
+    public Trajectory getFeederStationScoreWide() {
+        return S3W;
+    }
+
+    public Trajectory getFeederStationWallScoreWide() {
+        return S4W;
     }
 }

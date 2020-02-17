@@ -30,11 +30,11 @@ public class ScoreAndRun extends CommandBase {
 
   public ScoreAndRun(int startingPos, RamseteController controller, Drivetrain dt, Intake intake, Arm arm) {
 
-    Command angleArmScore = new InstantCommand(() -> arm.setSetPoint(ArmConstants.kScoreAngle), arm);
+    Command angleArmScore = new RunCommand(() -> arm.set(1), arm);
     Command scoreAndRun = new RunCommand(() -> intake.out(), intake).withTimeout(1)
         .andThen(new ScoreTurn(controller, dt))
         .alongWith(
-            new WaitCommand(.5).andThen(new InstantCommand(() -> arm.setSetPoint(ArmConstants.kForwardAngle), arm)))
+            new WaitCommand(.5).andThen(new RunCommand(() -> arm.set(-1), arm)))
         .andThen(new ScoreRun(controller, dt)).raceWith(new RunCommand(() -> intake.in(), intake));
 
     Command wait1 = new WaitCommand(SB.AutonDat.getInstance().getWait1());
