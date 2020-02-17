@@ -17,7 +17,7 @@ public class Intake extends SubsystemBase {
   private final TalonSRX m_wheels = new TalonSRX(IntakeConstants.kMotor);
 
   /**
-   * Creates a new BallSucker.
+   * Creates a new Intake.
    */
   public Intake() {
 
@@ -37,6 +37,6 @@ public class Intake extends SubsystemBase {
   }
 
   public void set(double speed) {
-    m_wheels.set(ControlMode.PercentOutput, speed);
+    m_wheels.set(ControlMode.PercentOutput, speed * IntakeConstants.kSpeed);
   }
 }
