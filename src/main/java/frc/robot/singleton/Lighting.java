@@ -12,7 +12,7 @@ import frc.robot.Constants.MiscConstants;
 import frc.robot.singleton.SB.LightingDat;
 
 public class Lighting {
-  private final static Lighting lighting = new Lighting();
+  private static Lighting lighting = new Lighting();
 
   private Lighting() {
   }
@@ -21,17 +21,16 @@ public class Lighting {
     return lighting;
   }
 
-
   private final Spark Blinkin = new Spark(MiscConstants.kBlinkinPort);
   private int mode = 1;
   private double val = -0.99;
 
   public void update() {
     // This method will be called once per scheduler run
-    int sbMode = (int) LightingDat.getInstance().getMode();
+    int sbMode = LightingDat.getInstance().getMode();
     if (mode != sbMode) {
       if (sbMode > 100 || sbMode < 1) {
-        LightingDat.getInstance().update(mode);
+        LightingDat.getInstance().update((Number) mode);
       } else {
         mode = sbMode;
         updateVal(mode);

@@ -169,8 +169,8 @@ public class DS4 extends Joystick implements AutoCloseable {
 
 	public double getY(boolean applyDeadband) {
 		if (applyDeadband)
-			return applyDeadband(getY());
-		return getY();
+			return applyDeadband(-getY());
+		return -getY(); // For whatever reason, vertical axis are inverted
 	}
 
 	public double getZ(boolean applyDeadband) {
@@ -194,6 +194,7 @@ public class DS4 extends Joystick implements AutoCloseable {
 	}
 
 	private double applyDeadband(double value) {
+		// Copied from DifferentialDrive
 		if (Math.abs(value) > deadband) {
 			if (value > 0.0) {
 				return (value - deadband) / (1.0 - deadband);
