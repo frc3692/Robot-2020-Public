@@ -8,17 +8,31 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.LiftConstants;
+import frc.robot.util.pneumatics.SingleWrapper;
+import frc.robot.util.pneumatics.SolWrapper;
 
-public class Climber extends SubsystemBase {
+public class Lift extends SubsystemBase {
+  private SolWrapper release = new SingleWrapper(LiftConstants.kRelease);
+
+  private boolean released = false;
   /**
    * Creates a new Climber.
    */
-  public Climber() {
+  public Lift() {
 
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    if(released) {
+      release.rev();
+    }
+  }
+
+  public void release(Arm arm) {
+    arm.forceDown();
+    released = true;
   }
 }
