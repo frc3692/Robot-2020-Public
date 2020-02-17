@@ -37,12 +37,12 @@ public final class Constants {
         /** Frame width in meters (includes bumpers) */
         public static final double kFrameWidth = 0.9144; // 36 in
         /** Frame length in meters (includes bumpers) */
-        public static final double kFrameLength = 0.94615;
+        public static final double kFrameLength = 0.94615; // 37 1/4 in
         /** Wheelbase in meters */
-        public static final double kTrackWidth = 0.6096;
+        public static final double kTrackWidth = 0.6096; // 24 in
 
         // PID
-        /** Encoder distance per revolution */
+        /** Encoder distance per revolution in m */
         public static final double kEncDPR = kWheelCirc / kGearRatio;
 
         // Auto
@@ -84,8 +84,7 @@ public final class Constants {
 
     public static final class IntakeConstants {
         public static final int kMotor = 9;
-        public static final double kSpeed = 1;
-        public static final double kTopSpeed = 1;
+        public static final double kSpeed = .6;
     }
 
     public static final class ColorWheelConstants {
@@ -97,7 +96,6 @@ public final class Constants {
     }
 
     public static final class LiftConstants {
-        public static final int kHookMotor = 8;
         public static final int kRelease = 0;
     }
 
