@@ -7,9 +7,7 @@
 
 package frc.robot.subsystems;
 
-import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
@@ -21,6 +19,8 @@ import frc.robot.Constants.ArmConstants;
 public class Arm extends SubsystemBase {
   private CANSparkMax m_motor = new CANSparkMax(ArmConstants.kMotor, MotorType.kBrushless);
   private DutyCycleEncoder m_enc = new DutyCycleEncoder(ArmConstants.kEnc);
+
+  private boolean m_forceDown = false;
 
   /**
    * Creates a new ReservoirArm.
@@ -38,23 +38,38 @@ public class Arm extends SubsystemBase {
     SmartDashboard.putNumber("Arm Amps", m_motor.getOutputCurrent());
     SmartDashboard.putNumber("Enc vel", m_motor.getEncoder().getVelocity());
     SmartDashboard.putNumber("Arm Temp", m_motor.getMotorTemperature());
+
+    if(m_forceDown) {
+      set(-1, true);
+    }
   }
 
   public void set(double speed) {
-    // This is a mess
-    speed = -speed;
-    if(speed < 0 && m_enc.get() < 0.09) {
-      m_motor.set(0.25 * speed);
-    } else if(speed < 0 && m_enc.get() < 0.18) {
-      m_motor.set(0.15 * speed);
-    } else if(speed < 0 && m_enc.get() > .18) {
-      m_motor.set(0);
-    } else if(speed > 0 && m_enc.get() > .2){
-      m_motor.set(speed * 0.15);
-    } else {
-      m_motor.set(0);
+    set(speed, false);
+  }
 
+  private void set(double speed, boolean override) {
+    if (!m_forceDown || override) {
+      if (speed > 0 && m_enc.get() < ArmConstants.kRestPos) {
+        // At the bottom and lifting
+        m_motor.set(ArmConstants.kInitialSpeed);
+      } else if (speed < 0 && m_enc.get() < ArmConstants.kSpringPos) {
+        // In the middle of lifting
+        m_motor.set(ArmConstants.kHelpSpeed);
+      } else if (speed < 0 && m_enc.get() > ArmConstants.kSpringPos) {
+        // Lifted
+        m_motor.set(0);
+      } else if (speed > 0 && m_enc.get() > ArmConstants.kFallPos) {
+        // At the top and going down
+        m_motor.set(ArmConstants.kInitialSpeed);
+      } else {
+        // Motor will slow the fall
+        m_motor.set(0);
+      }
     }
+  }
 
+  public void forceDown() {
+    m_forceDown = true;
   }
 }
