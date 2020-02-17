@@ -7,7 +7,6 @@
 
 package frc.robot.commands.auto;
 
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Drivetrain;
 /** Why would you use this? */
@@ -45,6 +44,6 @@ public class Spin extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return DriverStation.getInstance().isOperatorControl();
+    return false;
   }
 }
