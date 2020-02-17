@@ -8,12 +8,23 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.controller.RamseteController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import frc.robot.Constants.DriveConstants;
+import frc.robot.commands.arm.ArmLoop;
+import frc.robot.commands.auto.ScoreAndRun;
+import frc.robot.commands.auto.ScoreAndRunWide;
 import frc.robot.commands.drive.ArcadeDrive;
-import frc.robot.misc.DS4;
-import frc.robot.misc.DS4.DSButton;
+import frc.robot.commands.intake.IntakeLoop;
+import frc.robot.singleton.SB;
+import frc.robot.util.DS4;
+import frc.robot.util.DS4.DSButton;
+import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.Climber;
+import frc.robot.subsystems.ColorWheelActuator;
 import frc.robot.subsystems.Drivetrain;
+import frc.robot.subsystems.Intake;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -32,11 +43,15 @@ public class RobotContainer {
   }
 
   // Subsystems
-  private final Drivetrain m_Drivetrain = new Drivetrain();
+  private final Arm m_arm = new Arm();
+  private final Intake m_intake = new Intake();
+  private final Climber m_climber = new Climber();
+  private final Drivetrain m_drivetrain = new Drivetrain();
+  private final ColorWheelActuator m_colorWheelActuator = new ColorWheelActuator();
 
   // Sensors
   private final DS4 m_driveController = new DS4(0);
-  private final DS4 m_mechanismController = new DS4(1);
+  private final DS4 m_mechanismController = new DS4(1, 0.1);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -46,8 +61,16 @@ public class RobotContainer {
     configureButtonBindings();
 
     // Set up subsystems
-    m_Drivetrain.setDefaultCommand(
-      new ArcadeDrive(() -> m_driveController.getY(), () -> m_driveController.getZ(), m_Drivetrain));
+    m_drivetrain.setDefaultCommand(
+        new ArcadeDrive(() -> m_driveController.getY(), () -> m_driveController.getZ(), m_drivetrain));
+
+    // m_colorWheelActuator.setDefaultCommand(new ColorLoop(() ->
+    // m_mechanismController.getY(true),
+    // () -> m_mechanismController.getZ(true), m_colorWheelActuator));
+
+    m_arm.setDefaultCommand(new ArmLoop(() -> m_mechanismController.getY(true), m_arm));
+
+    m_intake.setDefaultCommand(new IntakeLoop(() -> m_mechanismController.getNetTriggers(), m_intake));
   }
 
   /**
@@ -61,11 +84,11 @@ public class RobotContainer {
     // Configure Driver Controls
     m_driveController.getBtn(DSButton.psBtn).whenPressed(new InstantCommand(() -> Config.Inverted = !Config.Inverted));
 
-    m_driveController.getBtn(DSButton.lt).whenPressed(new InstantCommand(() -> m_Drivetrain.slow(true), m_Drivetrain))
-        .whenReleased(new InstantCommand(() -> m_Drivetrain.slow(false), m_Drivetrain));
+    m_driveController.getBtn(DSButton.lt).whenPressed(new InstantCommand(() -> m_drivetrain.slow(true), m_drivetrain))
+        .whenReleased(new InstantCommand(() -> m_drivetrain.slow(false), m_drivetrain));
 
-    m_driveController.getBtn(DSButton.rt).whenPressed(new InstantCommand(() -> m_Drivetrain.boost(true), m_Drivetrain))
-        .whenReleased(new InstantCommand(() -> m_Drivetrain.boost(false), m_Drivetrain));
+    m_driveController.getBtn(DSButton.rt).whenPressed(new InstantCommand(() -> m_drivetrain.boost(true), m_drivetrain))
+        .whenReleased(new InstantCommand(() -> m_drivetrain.boost(false), m_drivetrain));
   }
 
   /**
@@ -74,7 +97,24 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // Build Route
+    Command autonCommand = null;
+    RamseteController controller = new RamseteController(DriveConstants.kRamseteB, DriveConstants.kRamseteZeta);
+
+    switch (SB.AutonDat.getInstance().getRoutine()) {
+    case 0:
+      // Score and Run
+      autonCommand = new ScoreAndRun(SB.AutonDat.getInstance().getStartingPosition(), controller, m_drivetrain, m_intake, m_arm);
+      break;
+    case 1:
+      // Score and Run Wide]
+      autonCommand = new ScoreAndRunWide(SB.AutonDat.getInstance().getStartingPosition(), controller, m_drivetrain, m_intake, m_arm);
+    }
+    if(autonCommand != null)
+      autonCommand = autonCommand.withInterrupt(() -> m_driveController.getRawButton(DSButton.o) || m_mechanismController.getRawButton(DSButton.o));
     return null;
+  }
+
+  public void end() {
+    m_drivetrain.stop();
   }
 }
