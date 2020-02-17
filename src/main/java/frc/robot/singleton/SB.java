@@ -10,21 +10,104 @@ package frc.robot.singleton;
 import java.util.Map;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import frc.robot.util.Debug;
 
 /**
  * Shuffleboard Controller
  */
 public class SB {
+    public static class AutonDat {
+        private final static AutonDat auto = new AutonDat();
+
+        public static AutonDat getInstance() {
+            return auto;
+        }
+
+        private final ShuffleboardTab autoTab = Shuffleboard.getTab("Auto");
+        private final ShuffleboardLayout autoChooserList = autoTab.getLayout("Autonomous Chooser", BuiltInLayouts.kList).withPosition(0, 0).withSize(2, 2);
+        private final ShuffleboardLayout waitList = autoTab.getLayout("Wait times", BuiltInLayouts.kList).withPosition(0, 2).withSize(2, 2);
+
+        private final NetworkTableEntry chosenAuto = autoTab.add("Chosen Auto", "Power Port Score and Run").withPosition(2, 0).withSize(3, 1).getEntry();
+        private final NetworkTableEntry push = autoTab.add("Push another bot?", false).withWidget(BuiltInWidgets.kToggleButton).withPosition(3, 1).withSize(2, 1).getEntry();
+
+        private final NetworkTableEntry wait1 = waitList.add("Wait 1", 0).getEntry();
+        private final NetworkTableEntry wait2 = waitList.add("Wait 2", 0).getEntry();
+        private final NetworkTableEntry wait3 = waitList.add("Wait 3", 0).getEntry();
+        private final SendableChooser<Integer> positionChooser = new SendableChooser<>(), routineChooser = new SendableChooser<>();
+
+        private final String[] startingPos = {
+            "Power Port Wall",
+            "Power Port",
+            "Center",
+            "Feeder Station",
+            "Feeder Station Wall"
+        },
+        routines = {
+            "Score and Run",
+            "Score Wide and Run",
+            "Run Only",
+            "Everybot",
+            "Spin"
+        };
+        private AutonDat() {
+            if(!DriverStation.getInstance().isFMSAttached()) {
+                // Put in test autos
+            }
+            Debug.log("Auto");
+            positionChooser.addOption("Power Port Wall", 0);
+            positionChooser.setDefaultOption("Power Port", 1);
+            positionChooser.addOption("Center", 2);
+            positionChooser.addOption("Feeder Station", 3);
+            positionChooser.addOption("Feeder Station Wall", 4);
+            
+            routineChooser.setDefaultOption("Score and Run", 0);
+            routineChooser.addOption("Score Wide and Run", 1);
+            routineChooser.addOption("Run Only", 2);
+            routineChooser.addOption("Everybot", 3);
+            routineChooser.addOption("Spin (This auto is a joke, do not choose it unless you don't want to score any points)", 4); // I'm leaving this in
+
+            autoChooserList.add(positionChooser);
+            autoChooserList.add(routineChooser);
+        }
+
+        public int getStartingPosition() {
+            return positionChooser.getSelected();
+        }
+
+        public int getRoutine() {
+            return routineChooser.getSelected();
+        }
+
+        public void update() {
+            chosenAuto.forceSetString((getPushing() ? "Push then " : "") + startingPos[positionChooser.getSelected()] + " " + routines[routineChooser.getSelected()]);
+        }
+
+        public double getWait1() {
+            return wait1.getDouble(0);
+        }
+
+        public double getWait2() {
+            return wait2.getDouble(0);
+        }
+
+        public double getWait3() {
+            return wait3.getDouble(0);
+        }
+
+        public boolean getPushing() {
+            return push.getBoolean(false);
+        }
+    }
+
     public static class DriveDat {
         private final static DriveDat drive = new DriveDat();
-
-        private DriveDat() {
-        }
 
         public static DriveDat getInstance() {
             return drive;
@@ -37,6 +120,7 @@ public class SB {
         private final ShuffleboardLayout driveData = driveTab.getLayout("Misc Data", BuiltInLayouts.kList)
                 .withPosition(2, 0).withSize(1, 2);
         private final ShuffleboardLayout driveAmps = driveTab.getLayout("Amperage", BuiltInLayouts.kGrid)
+                .withProperties(Map.of("rows", 2, "columns", 2))
                 .withPosition(0, 2).withSize(3, 4);
 
         private final NetworkTableEntry Slow = driveSpeeds.addPersistent("Slow Speed", 0.5).getEntry();
@@ -44,7 +128,7 @@ public class SB {
         private final NetworkTableEntry Boost = driveSpeeds.addPersistent("Boost Speed", 1).getEntry();
 
         private final NetworkTableEntry Mult = driveData.addPersistent("Mult", 0.75)
-                .withWidget(BuiltInWidgets.kNumberBar).withProperties(Map.of("min", 0, "max", 1)).getEntry();
+                .withProperties(Map.of("min", 0, "max", 1)).getEntry();
         private final NetworkTableEntry Boosted = driveData.addPersistent("Boosted", false)
                 .withWidget(BuiltInWidgets.kBooleanBox).getEntry();
         private final NetworkTableEntry Slowed = driveData.addPersistent("Slowed", false)
@@ -58,6 +142,9 @@ public class SB {
                 .withWidget(BuiltInWidgets.kGraph).withPosition(0, 1).getEntry();
         private final NetworkTableEntry BRAmperage = driveAmps.addPersistent("BR Amp Draw", 0)
                 .withWidget(BuiltInWidgets.kGraph).withPosition(1, 1).getEntry();
+
+        private DriveDat() {
+        }
 
         public double getSlowSpeed() {
             return Slow.getDouble(0.5);
@@ -87,9 +174,6 @@ public class SB {
     public static class LightingDat {
         private static LightingDat lighting = new LightingDat();
 
-        private LightingDat() {
-        }
-
         public static LightingDat getInstance() {
             return lighting;
         }
@@ -98,8 +182,11 @@ public class SB {
         private final NetworkTableEntry Mode = lightingTab.addPersistent("Mode", 1).getEntry();
         private final NetworkTableEntry Freeze = lightingTab.addPersistent("Freeze Mode", false).getEntry();
 
-        public Number getMode() {
-            return Mode.getNumber(1);
+        private LightingDat() {
+        }
+
+        public int getMode() {
+            return Mode.getNumber(1).intValue();
         }
 
         public boolean getFrozen() {
