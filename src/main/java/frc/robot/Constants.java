@@ -70,23 +70,16 @@ public final class Constants {
     public static final class ArmConstants {
         public static final int kMotor = 5;
 
-        public static final int kGearRatio = 36;
-
         public static final int kEnc = 0;
         /** Encoder counts per revolution */
         public static final int kEncCPR = 8192;
 
-        // PID
-        // TODO: Characterize Arm
-        public static final double kPVel = 0;
-        public static final double ksVolts = 0;
-        public static final double kMaxVel = 0;
-        public static final double kMaxAccel = 0;
+        public static final double kRestPos = 0.9;
+        public static final double kSpringPos = 0.18;
+        public static final double kFallPos = 0.2;
 
-        // TODO: Get encoder positions
-        public static final double retractedAngle = 0;
-        public static final double kScoreAngle = 0.18;
-        public static final double kForwardAngle = 0.6;
+        public static final double kInitialSpeed = 0.25;
+        public static final double kHelpSpeed = 0.15;
     }
 
     public static final class IntakeConstants {
@@ -105,7 +98,7 @@ public final class Constants {
 
     public static final class LiftConstants {
         public static final int kHookMotor = 8;
-        public static final int kReleaseServo = 1;
+        public static final int kRelease = 0;
     }
 
     public static final class MiscConstants {
