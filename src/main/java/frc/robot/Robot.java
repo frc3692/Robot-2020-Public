@@ -71,7 +71,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledPeriodic() {
-    SB.AutonDat.getInstance().update();
+    SB.AutonDat.getInstance().periodic();
   }
 
   /**

@@ -16,6 +16,7 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.commands.auto.DriveDistance;
 import frc.robot.commands.auto.ScoreAndRun;
 import frc.robot.commands.auto.ScoreAndRunWide;
+import frc.robot.commands.auto.Spin;
 import frc.robot.commands.colorwheel.ColorLoop;
 import frc.robot.commands.drive.ArcadeDrive;
 import frc.robot.commands.intake.IntakeLoop;
@@ -101,7 +102,8 @@ public class RobotContainer {
 
     // Configure Lift
     // Configure Buttons
-    m_mechanismController.getBtn(DSButton.psBtn).whenPressed(new InstantCommand(() -> m_lift.release(m_arm), m_lift, m_arm));
+    m_mechanismController.getBtn(DSButton.psBtn)
+        .whenPressed(new InstantCommand(() -> m_lift.release(m_arm), m_lift, m_arm));
 
   }
 
@@ -115,16 +117,49 @@ public class RobotContainer {
     RamseteController controller = new RamseteController(DriveConstants.kRamseteB, DriveConstants.kRamseteZeta);
 
     switch (SB.AutonDat.getInstance().getRoutine()) {
-    case 0:
-      // Score and Run
-      autonCommand = new ScoreAndRun(SB.AutonDat.getInstance().getStartingPosition(), controller, m_drivetrain,
-          m_intake, m_arm);
-      break;
-    case 1:
-      // Score and Run Wide]
-      autonCommand = new ScoreAndRunWide(SB.AutonDat.getInstance().getStartingPosition(), controller, m_drivetrain,
-          m_intake, m_arm);
+      case 0:
+
+        break;
+      case 1:
+
+        break;
+      case 3:
+
+        break;
+      case 4:
+
+        break;
+      case 5:
+
+        break;
+      case 6:
+
+        break;
+      case 7:
+
+        break;
+      case 8:
+        // Score and Run
+        autonCommand = new ScoreAndRun(SB.AutonDat.getInstance().getStartingPosition(), controller, m_drivetrain,
+            m_intake, m_arm);
+        break;
+      case 9:
+        // Score and Run Wide
+        autonCommand = new ScoreAndRunWide(SB.AutonDat.getInstance().getStartingPosition(), controller, m_drivetrain,
+            m_intake, m_arm);
+        break;
+      case 10:
+
+        break;
+      case 11:
+
+        break;
+      case 12:
+        // Why
+        autonCommand = new Spin(0.5, m_drivetrain);
+        break;
     }
+
     if (autonCommand != null)
       if (SB.AutonDat.getInstance().getPushing())
         autonCommand = new DriveDistance(-DriveConstants.kFrameLength / 2, m_drivetrain).andThen(autonCommand);

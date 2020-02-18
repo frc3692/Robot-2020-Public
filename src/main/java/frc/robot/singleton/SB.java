@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import frc.robot.RobotContainer;
 import frc.robot.util.Debug;
 
 /**
@@ -52,11 +53,12 @@ public class SB {
         routines = {
             "Steal 2 & Score 15",
             "Steal All & Score 15",
-            "Score Trench & Generator Switch",
+            "Score Trench & Generator Switch Balls",
+            "Steal All & Score Generator Switch Balls",
             "Steal All & Score Trench",
-            "Steal All & Score Generator Switch",
             "Score Trench",
-
+            "Score Generator Switch Balls",
+            "Steal All & Score",
             "Score and Run",
             "Score Wide and Run",
             "Run Only",
@@ -74,6 +76,7 @@ public class SB {
             positionChooser.addOption("Feeder Station", 3);
             positionChooser.setDefaultOption("Feeder Station Wall", 4);
             
+            
             routineChooser.setDefaultOption("Steal 2, Score Trench, and Generator Switch (15 Balls) (Feeder Station Only)", 0);
             routineChooser.addOption("Steal Trench, Score Trench, and Generator Switch (15 Balls) (Feeder Station Only & No Preload)", 1);
             routineChooser.addOption("Score Trench and Generator Switch (13 Balls) ", 2);
@@ -81,7 +84,7 @@ public class SB {
             routineChooser.addOption("Steal Trench and Score Trench (10 Balls) (No Preload)", 5);
             routineChooser.addOption("Score Trench (8 Balls)", 4);
             routineChooser.addOption("Score Generator Switch (8 Balls)", 6);
-            routineChooser.addOption("Steal Trench (5 Balls) (No Preload)", 7);
+            routineChooser.addOption("Steal Trench (5 Balls) (No Preload & Recommended Start at Feeder Station)", 7);
             routineChooser.addOption("Score and Run (3 Balls)", 8);
             routineChooser.addOption("Score Wide and Run (3 Balls)", 9);
             routineChooser.addOption("Run Only (0 Balls) (No Preload)", 10);
@@ -99,7 +102,7 @@ public class SB {
             return routineChooser.getSelected();
         }
 
-        public void update() {
+        public void periodic() {
             chosenAuto.forceSetString((getPushing() ? "Push then " : "") + startingPos[positionChooser.getSelected()] + " " + routines[routineChooser.getSelected()]);
         }
 
@@ -182,6 +185,12 @@ public class SB {
             FRAmperage.setNumber(framp);
             BLAmperage.setNumber(blamp);
             BRAmperage.setNumber(bramp);
+        }
+
+        public void periodic() {
+            RobotContainer.Config.BoostSpd = getBoostSpeed();
+            RobotContainer.Config.NormalSpd = getNormalSpeed();
+            RobotContainer.Config.SlowSpd = getSlowSpeed();
         }
     }
 
