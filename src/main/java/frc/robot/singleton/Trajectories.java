@@ -34,68 +34,68 @@ public class Trajectories {
     private Trajectories() {
         try {
             S1 = TrajectoryUtil.fromPathweaverJson(
-                    Filesystem.getDeployDirectory().toPath().resolve("paths\\S1 PPW.wpilib.json"));
+                    Filesystem.getDeployDirectory().toPath().resolve("paths\\S-1 PPW.wpilib.json"));
         } catch (IOException e) {
             DriverStation.reportError(e.getMessage(), e.getStackTrace());
         }
         try {
             S2 = TrajectoryUtil
-                    .fromPathweaverJson(Filesystem.getDeployDirectory().toPath().resolve("paths\\S2 PP.wpilib.json"));
+                    .fromPathweaverJson(Filesystem.getDeployDirectory().toPath().resolve("paths\\S-2 PP.wpilib.json"));
         } catch (IOException e) {
             DriverStation.reportError(e.getMessage(), e.getStackTrace());
         }
         try {
             S3 = TrajectoryUtil
-                    .fromPathweaverJson(Filesystem.getDeployDirectory().toPath().resolve("paths\\S3 C.wpilib.json"));
+                    .fromPathweaverJson(Filesystem.getDeployDirectory().toPath().resolve("paths\\S-3 C.wpilib.json"));
         } catch (IOException e) {
             DriverStation.reportError(e.getMessage(), e.getStackTrace());
         }
         try {
             S4 = TrajectoryUtil
-                    .fromPathweaverJson(Filesystem.getDeployDirectory().toPath().resolve("paths\\S4 FS.wpilib.json"));
+                    .fromPathweaverJson(Filesystem.getDeployDirectory().toPath().resolve("paths\\S-4 FS.wpilib.json"));
         } catch (IOException e) {
             DriverStation.reportError(e.getMessage(), e.getStackTrace());
         }
         try {
             S5 = TrajectoryUtil.fromPathweaverJson(
-                    Filesystem.getDeployDirectory().toPath().resolve("paths\\S5 FSW.wpilib.json"));
+                    Filesystem.getDeployDirectory().toPath().resolve("paths\\S-5 FSW.wpilib.json"));
         } catch (IOException e) {
             DriverStation.reportError(e.getMessage(), e.getStackTrace());
         }
         try {
             S1W = TrajectoryUtil.fromPathweaverJson(
-                    Filesystem.getDeployDirectory().toPath().resolve("paths\\SW1 PPW.wpilib.json"));
+                    Filesystem.getDeployDirectory().toPath().resolve("paths\\SW-1 PPW.wpilib.json"));
         } catch (IOException e) {
             DriverStation.reportError(e.getMessage(), e.getStackTrace());
         }
         try {
             S2W = TrajectoryUtil.fromPathweaverJson(
-                    Filesystem.getDeployDirectory().toPath().resolve("paths\\SW2 C.wpilib.json"));
+                    Filesystem.getDeployDirectory().toPath().resolve("paths\\SW-2 C.wpilib.json"));
         } catch (IOException e) {
             DriverStation.reportError(e.getMessage(), e.getStackTrace());
         }
         try {
             S3W = TrajectoryUtil.fromPathweaverJson(
-                    Filesystem.getDeployDirectory().toPath().resolve("paths\\SW3 FS.wpilib.json"));
+                    Filesystem.getDeployDirectory().toPath().resolve("paths\\SW-3 FS.wpilib.json"));
         } catch (IOException e) {
             DriverStation.reportError(e.getMessage(), e.getStackTrace());
         }
         try {
             S4W = TrajectoryUtil.fromPathweaverJson(
-                    Filesystem.getDeployDirectory().toPath().resolve("paths\\SW4 FSW.wpilib.json"));
+                    Filesystem.getDeployDirectory().toPath().resolve("paths\\SW-4 FSW.wpilib.json"));
         } catch (IOException e) {
             DriverStation.reportError(e.getMessage(), e.getStackTrace());
         }
         try {
             ST = reverseTrajectory(TrajectoryUtil
-                    .fromPathweaverJson(Filesystem.getDeployDirectory().toPath().resolve("paths\\ST.wpilib.json")));
+                    .fromPathweaverJson(Filesystem.getDeployDirectory().toPath().resolve("paths\\S-T.wpilib.json")));
         } catch (IOException e) {
             DriverStation.reportError(e.getMessage(), e.getStackTrace());
         }
         
         try {
             SR = TrajectoryUtil
-                    .fromPathweaverJson(Filesystem.getDeployDirectory().toPath().resolve("paths\\SR.wpilib.json"));
+                    .fromPathweaverJson(Filesystem.getDeployDirectory().toPath().resolve("paths\\S-R.wpilib.json"));
         } catch (IOException e) {
             DriverStation.reportError(e.getMessage(), e.getStackTrace());
         }
