@@ -14,15 +14,15 @@ public class DoubleWrapper extends SolWrapper {
 	DoubleSolenoid base;
 
 	public DoubleWrapper(int fwd, int rev) {
-		this.base = new DoubleSolenoid(fwd, rev);
+		super(new DoubleSolenoid(fwd, rev));
+		this.base = (DoubleSolenoid)getBase();
 		base.set(Value.kReverse);
 
-		set(SolState.closed);
-		setBase(base);
+		set(SolState.rev);
 	}
 
 	public void set(SolState state) {
 		setState(state);
-		base.set((state == SolState.open) ? Value.kForward : Value.kReverse);
+		base.set((state == SolState.fwd) ? Value.kForward : Value.kReverse);
 	}
 }

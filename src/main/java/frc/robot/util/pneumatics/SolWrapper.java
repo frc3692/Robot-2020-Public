@@ -16,12 +16,16 @@ public abstract class SolWrapper {
 
 	public abstract void set(SolState state);
 
+	protected SolWrapper(SolenoidBase base) {
+		this.base = base;
+	}
+
 	public void fwd() {
-		set(SolState.open);
+		set(SolState.fwd);
 	}
 
 	public void rev() {
-		set(SolState.closed);
+		set(SolState.rev);
 	}
 
 	public SolState getState() {
@@ -38,10 +42,6 @@ public abstract class SolWrapper {
 
 	public SolenoidBase getBase() {
 		return base;
-	}
-
-	protected void setBase(SolenoidBase base) {
-		this.base = base;
 	}
 
 	protected void setState(SolState state) {

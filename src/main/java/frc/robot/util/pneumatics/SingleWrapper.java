@@ -13,15 +13,15 @@ public class SingleWrapper extends SolWrapper {
 	Solenoid base;
 
 	public SingleWrapper(int id) {
-		this.base = new Solenoid(id);
-		base.set(false);
+		super(new Solenoid(id));
+		base = (Solenoid)getBase();
 
-		set(SolState.closed);
-		setBase(base);
+		base.set(false);
+		set(SolState.rev);
 	}
 
 	public void set(SolState state) {
 		setState(state);
-		base.set((state == SolState.open) ? true : false);
+		base.set(state == SolState.fwd);
 	}
 }
