@@ -74,12 +74,13 @@ public final class Constants {
         /** Encoder counts per revolution */
         public static final int kEncCPR = 8192;
 
-        public static final double kRestPos = 0.9;
+        public static final double kRestPos = 0.09;
         public static final double kSpringPos = 0.18;
         public static final double kFallPos = 0.2;
 
-        public static final double kInitialSpeed = 0.25;
-        public static final double kHelpSpeed = 0.15;
+        public static final double kDropSpeed = 0.15;
+        public static final double kLiftSpeed = -0.3;
+        public static final double kHelpSpeed = -0.15;
     }
 
     public static final class IntakeConstants {
