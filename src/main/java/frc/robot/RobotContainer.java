@@ -97,8 +97,8 @@ public class RobotContainer {
 
     // Configure Arm
     // Configure Buttons
-    m_mechanismController.getBtn(DSButton.povU).whenPressed(new RunCommand(() -> m_arm.set(1))); // Up
-    m_mechanismController.getBtn(DSButton.povD).whenPressed(new RunCommand(() -> m_arm.set(-1))); // Down
+    m_mechanismController.getBtn(DSButton.povU).whenPressed(new InstantCommand(() -> m_arm.setTarget(1))); // Up
+    m_mechanismController.getBtn(DSButton.povD).whenPressed(new InstantCommand(() -> m_arm.setTarget(-1))); // Down
 
     // Configure Lift
     // Configure Buttons

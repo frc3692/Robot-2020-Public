@@ -19,6 +19,7 @@ import frc.robot.Constants.ArmConstants;
 public class Arm extends SubsystemBase {
   private CANSparkMax m_motor = new CANSparkMax(ArmConstants.kMotor, MotorType.kBrushless);
   private DutyCycleEncoder m_enc = new DutyCycleEncoder(ArmConstants.kEnc);
+  private double m_target = 0;
 
   private boolean m_forceDown = false;
 
@@ -39,37 +40,33 @@ public class Arm extends SubsystemBase {
     SmartDashboard.putNumber("Enc vel", m_motor.getEncoder().getVelocity());
     SmartDashboard.putNumber("Arm Temp", m_motor.getMotorTemperature());
 
-    if(m_forceDown) {
-      set(-1, true);
-    }
-  }
+    double target = m_target;
+    if (m_forceDown)
+      target = -1;
 
-  public void set(double speed) {
-    set(speed, false);
-  }
-
-  private void set(double speed, boolean override) {
-    if (!m_forceDown || override) {
-      if (speed > 0 && m_enc.get() < ArmConstants.kRestPos) {
-        // At the bottom and lifting
-        m_motor.set(ArmConstants.kInitialSpeed);
-      } else if (speed < 0 && m_enc.get() < ArmConstants.kSpringPos) {
-        // In the middle of lifting
-        m_motor.set(ArmConstants.kHelpSpeed);
-      } else if (speed < 0 && m_enc.get() > ArmConstants.kSpringPos) {
-        // Lifted
-        m_motor.set(0);
-      } else if (speed > 0 && m_enc.get() > ArmConstants.kFallPos) {
-        // At the top and going down
-        m_motor.set(ArmConstants.kInitialSpeed);
-      } else {
-        // Motor will slow the fall
-        m_motor.set(0);
-      }
+    double speed = 0;
+    if (target > 0 && m_enc.get() < ArmConstants.kRestPos) {
+      // At the bottom and lifting
+      speed = ArmConstants.kLiftSpeed;
+    } else if (target > 0 && m_enc.get() < ArmConstants.kSpringPos) {
+      // In the middle of lifting
+      speed = ArmConstants.kHelpSpeed;
+    } else if (target > 0 && m_enc.get() > ArmConstants.kSpringPos) {
+      // Lifted
+      speed = 0;
+    } else if (target < 0 && m_enc.get() > ArmConstants.kFallPos) {
+      // At the top and going down
+      speed = ArmConstants.kDropSpeed;
     }
+    m_motor.set(speed);
+    SmartDashboard.putNumber("Arm Speed", speed);
   }
 
   public void forceDown() {
     m_forceDown = true;
+  }
+
+  public void setTarget(double target) {
+    m_target = target;
   }
 }
