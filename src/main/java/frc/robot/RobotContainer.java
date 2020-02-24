@@ -11,13 +11,14 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.controller.RamseteController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.commands.auto.DriveDistance;
 import frc.robot.commands.auto.ScoreAndRun;
 import frc.robot.commands.auto.ScoreAndRunWide;
 import frc.robot.commands.auto.Spin;
 import frc.robot.commands.colorwheel.ColorLoop;
+import frc.robot.commands.colorwheel.SpinAmt;
+import frc.robot.commands.colorwheel.RotationControl;
 import frc.robot.commands.drive.ArcadeDrive;
 import frc.robot.commands.intake.IntakeLoop;
 import frc.robot.singleton.SB;
@@ -26,7 +27,7 @@ import frc.robot.util.DS4.DSAxis;
 import frc.robot.util.DS4.DSButton;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Lift;
-import frc.robot.subsystems.ColorWheelActuator;
+import frc.robot.subsystems.ColorWheelManipulator;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Intake;
 
@@ -51,7 +52,7 @@ public class RobotContainer {
   private final Intake m_intake = new Intake();
   private final Lift m_lift = new Lift();
   private final Drivetrain m_drivetrain = new Drivetrain();
-  private final ColorWheelActuator m_colorWheelActuator = new ColorWheelActuator();
+  private final ColorWheelManipulator m_colorWheelManipulator = new ColorWheelManipulator();
 
   // Sensors
   private final DS4 m_driveController = new DS4(0);
@@ -86,10 +87,17 @@ public class RobotContainer {
 
     m_driveController.getBtn(DSButton.psBtn).whenPressed(new InstantCommand(() -> Config.Inverted = !Config.Inverted));
 
+    // Configure Mechanism Controller
+    m_mechanismController.setMod(DSButton.lb);
+
     // Configure Color Wheel Controls
     // Configure Axis
-    m_colorWheelActuator.setDefaultCommand(new ColorLoop(() -> m_mechanismController.getY(true),
-        () -> m_mechanismController.getRawAxis(DSAxis.ry, true), m_colorWheelActuator));
+    m_colorWheelManipulator.setDefaultCommand(new ColorLoop(() -> m_mechanismController.getY(true),
+        () -> m_mechanismController.getRawAxis(DSAxis.ry, true), m_colorWheelManipulator));
+
+    // Configure Buttons
+    m_mechanismController.getBtn(DSButton.tri).whileHeld(m_mechanismController.getDualModeCommand(
+        new RotationControl(m_colorWheelManipulator), new SpinAmt(3.1, m_colorWheelManipulator)));
 
     // Configure Intake
     // Configure Axis
@@ -97,8 +105,10 @@ public class RobotContainer {
 
     // Configure Arm
     // Configure Buttons
-    m_mechanismController.getBtn(DSButton.povU).whenPressed(new InstantCommand(() -> m_arm.setTarget(1))); // Up
-    m_mechanismController.getBtn(DSButton.povD).whenPressed(new InstantCommand(() -> m_arm.setTarget(-1))); // Down
+    m_mechanismController.getBtn(DSButton.povU).whenPressed(new InstantCommand(() -> m_arm.setTarget(1), m_arm)); // Up
+    m_mechanismController.getBtn(DSButton.povD).whenPressed(new InstantCommand(() -> m_arm.setTarget(-1), m_arm)); // Down
+    m_mechanismController.getBtn(DSButton.rb).whenPressed(new InstantCommand(() -> m_arm.hold(true), m_arm))
+        .whenReleased(new InstantCommand(() -> m_arm.hold(false), m_arm));
 
     // Configure Lift
     // Configure Buttons
@@ -157,6 +167,9 @@ public class RobotContainer {
       case 12:
         // Why
         autonCommand = new Spin(0.5, m_drivetrain);
+        break;
+      case 13:
+        autonCommand = new InstantCommand();
         break;
     }
 

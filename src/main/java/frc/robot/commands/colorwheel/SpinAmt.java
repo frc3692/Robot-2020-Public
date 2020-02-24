@@ -7,25 +7,21 @@
 
 package frc.robot.commands.colorwheel;
 
-import java.util.function.DoubleSupplier;
-
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.ColorWheelManipulator;
 
-public class ColorLoop extends CommandBase {
-  private ColorWheelManipulator colorWheelActuator;
-  private DoubleSupplier liftSpeed, wheelSpeed;
-
+public class SpinAmt extends CommandBase {
+  private ColorWheelManipulator m_colorwheel;
+  private double target;
+  private boolean neg;
   /**
-   * Creates a new RunLift.
+   * Creates a new PositionControl.
    */
-  public ColorLoop(DoubleSupplier liftSpeed, DoubleSupplier wheelSpeed, ColorWheelManipulator colorWheelActuator) {
+  public SpinAmt(double rotations, ColorWheelManipulator colorwheel) {
+    neg = rotations < 0;
+    target = rotations * 64 + colorwheel.getWheelPos();
     // Use addRequirements() here to declare subsystem dependencies.
-    this.liftSpeed = liftSpeed;
-    this.wheelSpeed = wheelSpeed;
-
-    this.colorWheelActuator = colorWheelActuator;
-    addRequirements(colorWheelActuator);
+    addRequirements(colorwheel);
   }
 
   // Called when the command is initially scheduled.
@@ -36,8 +32,7 @@ public class ColorLoop extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    colorWheelActuator.setLift(liftSpeed.getAsDouble());
-    colorWheelActuator.setWheel(wheelSpeed.getAsDouble());
+    m_colorwheel.spin(neg);
   }
 
   // Called once the command ends or is interrupted.
@@ -48,6 +43,6 @@ public class ColorLoop extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return neg ? m_colorwheel.getWheelPos() <= target: m_colorwheel.getWheelPos() >= target;
   }
 }

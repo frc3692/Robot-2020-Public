@@ -93,7 +93,17 @@ public final class Constants {
         public static final int kWheelMotor = 7;
 
         /** Max motor speed in RPM */
-        public static final int kWheelSpeed = 3200;
+        public static final int kMotorSpeed = 3200;
+
+        public static final double kS = 0.443;
+        public static final double kA = 0.0263;
+        public static final double kV = 0.239;
+
+        public static SimpleMotorFeedforward kFeedforward = new SimpleMotorFeedforward(kS, kV, kA);
+
+        public static final double kP = 0.00000528;
+        public static final double kI = 0.0000003;
+        public static final double kFF = 0; //0.000087;
     }
 
     public static final class LiftConstants {
