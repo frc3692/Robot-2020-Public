@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.controller.RamseteController;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -31,8 +32,8 @@ public class ScoreAndRunWide extends CommandBase {
   public ScoreAndRunWide(int startingPos, RamseteController controller, Drivetrain dt, Intake intake, Arm arm) {
     Trajectories trajectories = Trajectories.getInstance();
 
-    Command angleArmDown = new RunCommand(() -> arm.set(1), arm);
-    Command scoreAndRun = new RunCommand(() -> arm.set(-1), arm).withTimeout(0.5)
+    Command angleArmDown = new InstantCommand(() -> arm.setTarget(1), arm);
+    Command scoreAndRun = new InstantCommand(() -> arm.setTarget(-1), arm).withTimeout(0.5)
         .andThen(new RunCommand(() -> intake.out(), intake).withTimeout(1)).andThen(ramseteFromTrajectory(trajectories.getScoreRun()))
         .andThen(ramseteFromTrajectory(trajectories.getScoreRun()).raceWith(new RunCommand(() -> intake.in(), intake)));
 
