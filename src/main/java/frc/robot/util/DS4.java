@@ -8,8 +8,14 @@
 package frc.robot.util;
 
 import java.util.EnumMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SelectCommand;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.Button;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -55,8 +61,15 @@ public class DS4 extends Joystick implements AutoCloseable {
 		}
 	}
 
+	public enum CommandSet {
+		primary, secondary
+	}
+
 	private double deadband = 0.02;
 	private EnumMap<DSButton, Button> buttons;
+
+	private DSButton mod1;
+	private CommandSet commandSet = CommandSet.primary;
 
 	public DS4(int port) {
 		super(port);
@@ -66,6 +79,26 @@ public class DS4 extends Joystick implements AutoCloseable {
 	public DS4(int port, double deadband) {
 		this(port);
 		this.deadband = deadband;
+	}
+
+	public void setMod(DSButton btn) {
+		mod1 = btn;
+		getBtn(btn).whileHeld(
+				new StartEndCommand(() -> commandSet = CommandSet.secondary, () -> commandSet = CommandSet.primary));
+	}
+
+	public Command getDualModeCommand(Command primary, Command secondary) {
+		return new SelectCommand(
+				Map.ofEntries(Map.entry(CommandSet.primary, primary), Map.entry(CommandSet.secondary, secondary)),
+				this::getCommandSet);
+	}
+
+	public Command getDualModeCommand(Runnable primary, Runnable secondary) {
+		return getDualModeCommand(new InstantCommand(primary), new InstantCommand(secondary));
+	}
+
+	public CommandSet getCommandSet() {
+		return commandSet;
 	}
 
 	public Button getBtn(DSButton b) {
