@@ -21,7 +21,7 @@ public class Arm extends SubsystemBase {
   private DutyCycleEncoder m_enc = new DutyCycleEncoder(ArmConstants.kEnc);
   private double m_target = 0;
 
-  private boolean m_forceDown = false;
+  private boolean m_forceDown = false, holding = true;
 
   /**
    * Creates a new ReservoirArm.
@@ -45,18 +45,26 @@ public class Arm extends SubsystemBase {
       target = -1;
 
     double speed = 0;
-    if (target > 0 && m_enc.get() < ArmConstants.kRestPos) {
-      // At the bottom and lifting
-      speed = ArmConstants.kLiftSpeed;
-    } else if (target > 0 && m_enc.get() < ArmConstants.kSpringPos) {
-      // In the middle of lifting
-      speed = ArmConstants.kHelpSpeed;
-    } else if (target > 0 && m_enc.get() > ArmConstants.kSpringPos) {
-      // Lifted
-      speed = 0;
-    } else if (target < 0 && m_enc.get() > ArmConstants.kFallPos) {
-      // At the top and going down
-      speed = ArmConstants.kDropSpeed;
+    if (holding) {
+      if(m_enc.get() > ArmConstants.kFallPos) {
+        speed = ArmConstants.kHelpSpeed;
+      } else if(m_enc.get() < ArmConstants.kRestPos) {
+        speed = -ArmConstants.kHelpSpeed;
+      }
+    } else {
+      if (target > 0 && m_enc.get() < ArmConstants.kRestPos) {
+        // At the bottom and lifting
+        speed = ArmConstants.kLiftSpeed;
+      } else if (target > 0 && m_enc.get() < ArmConstants.kSpringPos) {
+        // In the middle of lifting
+        speed = ArmConstants.kHelpSpeed;
+      } else if (target > 0 && m_enc.get() > ArmConstants.kSpringPos) {
+        // Lifted
+        speed = 0;
+      } else if (target < 0 && m_enc.get() > ArmConstants.kFallPos) {
+        // At the top and going down
+        speed = ArmConstants.kDropSpeed;
+      }
     }
     m_motor.set(speed);
     SmartDashboard.putNumber("Arm Speed", speed);
@@ -68,5 +76,9 @@ public class Arm extends SubsystemBase {
 
   public void setTarget(double target) {
     m_target = target;
+  }
+
+  public void hold(boolean enabled) {
+    holding = enabled;
   }
 }
