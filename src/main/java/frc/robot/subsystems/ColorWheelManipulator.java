@@ -59,11 +59,6 @@ public class ColorWheelManipulator extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    SmartDashboard.putNumber("Motor Speed", m_wheelMotor.getEncoder().getVelocity());
-    SmartDashboard.putNumber("Motor Output", m_wheelMotor.getAppliedOutput());
-    SmartDashboard.putNumber("Wheel Current", m_wheelMotor.getOutputCurrent());
-    SmartDashboard.putNumber("Lift Current", m_liftMotor.getOutputCurrent());
-    SmartDashboard.putNumber("Wheel Voltage", m_wheelMotor.getBusVoltage());
   
     Color detectedColor = m_colorSensor.getColor();
     
@@ -83,7 +78,7 @@ public class ColorWheelManipulator extends SubsystemBase {
     }
 
 
-    SmartDashboard.putString("Color", colorString);
+    //SmartDashboard.putString("Color", colorString);
   }
 
   public void setLift(double speed) {
