@@ -8,6 +8,7 @@
 package frc.robot.commands.auto;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants.DriveConstants;
 import frc.robot.subsystems.Drivetrain;
 
 public class DriveDistance extends CommandBase {
@@ -44,6 +45,7 @@ public class DriveDistance extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return dt.atPosSetpoint();
+    //                            Prevent this from running until the robot is characterized
+    return dt.atPosSetpoint() || DriveConstants.kPDriveVel == 0;
   }
 }
