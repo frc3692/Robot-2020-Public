@@ -13,11 +13,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.commands.auto.DriveDistance;
+import frc.robot.commands.auto.SimpleScore;
 import frc.robot.commands.auto.ScoreAndRun;
 import frc.robot.commands.auto.ScoreAndRunWide;
+import frc.robot.commands.auto.SimpleDriveDist;
 import frc.robot.commands.auto.Spin;
 import frc.robot.commands.colorwheel.ColorLoop;
-import frc.robot.commands.colorwheel.SpinAmt;
+import frc.robot.commands.colorwheel.PositionControl;
 import frc.robot.commands.colorwheel.RotationControl;
 import frc.robot.commands.drive.ArcadeDrive;
 import frc.robot.commands.intake.IntakeLoop;
@@ -88,7 +90,7 @@ public class RobotContainer {
     m_driveController.getBtn(DSButton.psBtn).whenPressed(new InstantCommand(() -> Config.Inverted = !Config.Inverted));
 
     // Configure Mechanism Controller
-    m_mechanismController.setMod(DSButton.lb);
+    m_mechanismController.setMod1(DSButton.lb);
 
     // Configure Color Wheel Controls
     // Configure Axis
@@ -97,7 +99,7 @@ public class RobotContainer {
 
     // Configure Buttons
     m_mechanismController.getBtn(DSButton.tri).whileHeld(m_mechanismController.getDualModeCommand(
-        new RotationControl(m_colorWheelManipulator), new SpinAmt(3.1, m_colorWheelManipulator)));
+        new RotationControl(m_colorWheelManipulator), new PositionControl(m_colorWheelManipulator)));
 
     // Configure Intake
     // Configure Axis
@@ -105,8 +107,8 @@ public class RobotContainer {
 
     // Configure Arm
     // Configure Buttons
-    m_mechanismController.getBtn(DSButton.povU).whenPressed(new InstantCommand(() -> m_arm.setTarget(1), m_arm)); // Up
-    m_mechanismController.getBtn(DSButton.povD).whenPressed(new InstantCommand(() -> m_arm.setTarget(-1), m_arm)); // Down
+    m_mechanismController.getBtn(DSButton.povU).whenPressed(new InstantCommand(() -> m_arm.setSetpoint(1), m_arm)); // Up
+    m_mechanismController.getBtn(DSButton.povD).whenPressed(new InstantCommand(() -> m_arm.setSetpoint(-1), m_arm)); // Down
     m_mechanismController.getBtn(DSButton.rb).whenPressed(new InstantCommand(() -> m_arm.hold(true), m_arm))
         .whenReleased(new InstantCommand(() -> m_arm.hold(false), m_arm));
 
@@ -148,27 +150,33 @@ public class RobotContainer {
       case 7:
 
         break;
-      case 8:
+      case 9:
         // Score and Run
         autonCommand = new ScoreAndRun(SB.AutonDat.getInstance().getStartingPosition(), controller, m_drivetrain,
             m_intake, m_arm);
         break;
-      case 9:
+      case 10:
         // Score and Run Wide
         autonCommand = new ScoreAndRunWide(SB.AutonDat.getInstance().getStartingPosition(), controller, m_drivetrain,
             m_intake, m_arm);
-        break;
-      case 10:
-
         break;
       case 11:
 
         break;
       case 12:
+
+        break;
+      case 13:
+        autonCommand = new SimpleDriveDist(DriveConstants.kFrameLength, DriveConstants.kAutoSpeed, m_drivetrain);
+        break;
+      case 14:
+        autonCommand = new SimpleScore(SB.AutonDat.getInstance().getStartingPosition(), m_drivetrain, m_intake, m_arm);
+        break;
+      case 15:
         // Why
         autonCommand = new Spin(0.5, m_drivetrain);
         break;
-      case 13:
+      case 16:
         autonCommand = new InstantCommand();
         break;
     }

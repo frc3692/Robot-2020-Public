@@ -64,7 +64,8 @@ public class SB {
             "Score Wide and Run",
             "Run Only",
             "Everybot",
-            "Spin"
+            "Spin",
+            "Do Nothing"
         };
         private AutonDat() {
             if(!DriverStation.getInstance().isFMSAttached()) {
@@ -78,7 +79,7 @@ public class SB {
             positionChooser.setDefaultOption("Feeder Station Wall", 4);
             
             
-            routineChooser.setDefaultOption("Steal 2, Score Trench, and Generator Switch (15 Balls) (Feeder Station Only)", 0);
+            /*routineChooser.addOption("Steal 2, Score Trench, and Generator Switch (15 Balls) (Feeder Station Only)", 0);
             routineChooser.addOption("Steal Trench, Score Trench, and Generator Switch (15 Balls) (Feeder Station Only & No Preload)", 1);
             routineChooser.addOption("Score Trench and Generator Switch (13 Balls) ", 2);
             routineChooser.addOption("Steal Trench and Score Generator Switch (10 Balls) (Feeder Station Only & No Preload)", 3);
@@ -90,8 +91,11 @@ public class SB {
             routineChooser.addOption("Score and Run (3 Balls)", 9);
             routineChooser.addOption("Score Wide and Run (3 Balls)", 10);
             routineChooser.addOption("Run Only (0 Balls) (No Preload)", 11);
-            routineChooser.addOption("Everybot (0 Balls)", 12);
-            routineChooser.addOption("Spin (This auto is a joke, do not choose it unless you don't want to score any points)", 13); // I'm leaving this in
+            routineChooser.addOption("Everybot (0 Balls)", 12);*/
+            routineChooser.addOption("Drive from initiation line", 13);
+            routineChooser.addOption("Simple Score (only from Power Port)", 14);
+            routineChooser.addOption("Spin (This auto is a joke, do not choose it unless you don't want to score any points)", 15); // I'm leaving this in
+            routineChooser.setDefaultOption("Do Nothing", 16);
 
             autoChooserList.add(positionChooser);
         }

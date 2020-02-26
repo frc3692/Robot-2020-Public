@@ -36,4 +36,8 @@ public class Gyro {
     public double getTurnRate() {
         return m_ahrs.getRate();
     }
+
+    public float getAccel() {
+        return m_ahrs.getWorldLinearAccelX();
+    }
 }

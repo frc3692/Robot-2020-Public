@@ -35,8 +35,8 @@ public class ScoreAndRun extends CommandBase {
 
     Trajectories trajectories = Trajectories.getInstance();
 
-    Command angleArmDown = new InstantCommand(() -> arm.setTarget(1), arm);
-    Command scoreAndRun = new InstantCommand(() -> arm.setTarget(-1), arm).withTimeout(0.5)
+    Command angleArmDown = new InstantCommand(() -> arm.setSetpoint(1), arm);
+    Command scoreAndRun = new InstantCommand(() -> arm.setSetpoint(-1), arm).withTimeout(0.5)
         .andThen(new RunCommand(() -> intake.out(), intake).withTimeout(1)).andThen(ramseteFromTrajectory(trajectories.getScoreRun()))
         .andThen(ramseteFromTrajectory(trajectories.getScoreRun()).raceWith(new RunCommand(() -> intake.in(), intake)));
 
