@@ -18,11 +18,11 @@ public class DoubleWrapper extends SolWrapper {
 		this.base = (DoubleSolenoid)getBase();
 		base.set(Value.kReverse);
 
-		set(SolState.rev);
+		set(SolState.kRev);
 	}
 
 	public void set(SolState state) {
 		setState(state);
-		base.set((state == SolState.fwd) ? Value.kForward : Value.kReverse);
+		base.set((state == SolState.kFwd) ? Value.kForward : Value.kReverse);
 	}
 }
