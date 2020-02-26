@@ -115,7 +115,13 @@ public final class Constants {
         public static final int kRelease = 0;
     }
 
-    public static final class MiscConstants {
+    public static final class LightingConstants {
         public static final int kBlinkinPort = 0;
+        
+        public static final int kDefaultMode = 0;
+        public static final int kRedMode = 0;
+        public static final int kGreenMode = 0;
+        public static final int kBlueMode = 0;
+        public static final int kYellowMode = 0;
     }
 }
