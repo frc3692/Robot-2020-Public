@@ -1,6 +1,11 @@
+repositories {
+  maven { url 'https://jitpack.io' }
+}
+
 plugins {
     id "java"
     id "edu.wpi.first.GradleRIO" version "2020.3.2"
+    implementation "com.github.Oblarg.Oblog:lib:3.1.2"
 }
 
 sourceCompatibility = JavaVersion.VERSION_11

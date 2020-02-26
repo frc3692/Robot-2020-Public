@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.singleton.Lighting;
 import frc.robot.singleton.SB;
+import io.github.oblarg.oblog;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -35,6 +36,7 @@ public class Robot extends TimedRobot {
     // and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
+    Logger.configureLoggingAndConfig(this, false);
   }
 
   /**
@@ -59,6 +61,9 @@ public class Robot extends TimedRobot {
 
     // Update lighting
     Lighting.getInstance().update();
+
+    // Update shuffleboard
+    Logger.updateEntries();
   }
 
   /**

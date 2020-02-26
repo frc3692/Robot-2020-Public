@@ -9,33 +9,97 @@ package frc.robot.singleton;
 
 import java.util.Map;
 
-import edu.wpi.first.networktables.NetworkTableEntry;
+import frc.robot.util.Debug;
+import frc.robot.RobotContainer;
+
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.shuffleboard.LayoutType;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import frc.robot.RobotContainer;
-import frc.robot.util.Debug;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
+
+import io.github.oblarg.oblog;
+import io.github.oblarg.oblog.annotations;
 
 /**
  * Shuffleboard Controller
  */
 public class SB {
-    public static class AutonDat {
+    public static class AutonDat implements Loggable {
         private final static AutonDat auto = new AutonDat();
 
         public static AutonDat getInstance() {
             return auto;
         }
 
-        private final ShuffleboardTab autoTab = Shuffleboard.getTab("Auto");
+        @Override
+        public String configureLogName() {
+            return "Auto";
+        }
+
+        private class AutoChooser implements Loggable {
+            private static AutoChooser m_autoChooser = new AutoChooser();
+
+            private AutoChooser {
+            }
+
+            public static AutoChooser getInstance() {
+                return m_autoChooser;
+            }
+            
+            @Log
+            private final SendableChooser<Integer> positionChooser = new SendableChooser<>(), routineChooser = new SendableChooser<>();
+
+            public void setDefaultPosition(String key, int value) {
+                positionChooser.setDefaultOption(key, value);
+            }
+
+            public void addPosition(String key, int value) {
+                positionChooser.addOption(key, value);
+            }
+
+            public void setDefaultRoutine(String key, int value) {
+                routineChooser.setDefaultOption(key, value);
+            }
+
+            public void addRoutine(String key, int value) {
+                routineChooser.addOption(key, value);
+            }
+
+            public int getPosition() {
+                return positionChooser.getSelected();
+            }
+
+            public int getRoutine() {
+                return routineChooser.getSelected();
+            }
+
+            // Oblog Layout Config
+            @Override
+            public int[] configureLayoutPosition() {
+                return new int[] {0, 0};
+            }
+
+            @Override
+            public int[] configureLayoutSize() {
+                return new int[] {2, 2};
+            }
+
+            @Override
+            public LayoutType configureLayoutType() {
+                return BuiltInLayouts.kList;
+            }
+        }
+
         private final ShuffleboardLayout autoChooserList = autoTab.getLayout("Autonomous Chooser", BuiltInLayouts.kList).withPosition(0, 0).withSize(2, 2);
         private final ShuffleboardLayout waitList = autoTab.getLayout("Wait times", BuiltInLayouts.kList).withPosition(0, 2).withSize(2, 2);
 
-        private final NetworkTableEntry chosenAuto = autoTab.add("Chosen Auto", "Power Port Score and Run").withPosition(2, 0).withSize(3, 1).getEntry();
+        @log(name = "Chosen Auto", rowIndex = 2, columnIndex = 0, width = 3, height = 1)
+        private final String chosenAuto = "Do Nothing";
         private final NetworkTableEntry push = autoTab.add("Push another bot?", false).withWidget(BuiltInWidgets.kToggleButton).withPosition(3, 1).withSize(2, 1).getEntry();
 
         private final NetworkTableEntry wait1 = waitList.add("Wait 1", 0).getEntry();
@@ -64,6 +128,8 @@ public class SB {
             "Score Wide and Run",
             "Run Only",
             "Everybot",
+            "Move from Initiation Line",
+            "Simple Score",
             "Spin",
             "Do Nothing"
         };
@@ -71,45 +137,40 @@ public class SB {
             if(!DriverStation.getInstance().isFMSAttached()) {
                 // Put in test autos
             }
+
             Debug.log("Auto");
-            positionChooser.addOption("Power Port Wall", 0);
-            positionChooser.addOption("Power Port", 1);
-            positionChooser.addOption("Center", 2);
-            positionChooser.addOption("Feeder Station", 3);
-            positionChooser.setDefaultOption("Feeder Station Wall", 4);
+            AutoChooser autoChooser = AutoChooser.getInstance();
+
+            autoChooser.addPosition("Power Port Wall", 0);
+            autoChooser.addPosition("Power Port", 1);
+            autoChooser.addPosition("Center", 2);
+            autoChooser.addPosition("Feeder Station", 3);
+            autoChooser.setDefaultPosition("Feeder Station Wall", 4);
             
             
-            /*routineChooser.addOption("Steal 2, Score Trench, and Generator Switch (15 Balls) (Feeder Station Only)", 0);
-            routineChooser.addOption("Steal Trench, Score Trench, and Generator Switch (15 Balls) (Feeder Station Only & No Preload)", 1);
-            routineChooser.addOption("Score Trench and Generator Switch (13 Balls) ", 2);
-            routineChooser.addOption("Steal Trench and Score Generator Switch (10 Balls) (Feeder Station Only & No Preload)", 3);
-            routineChooser.addOption("Steal Trench and Score Trench (10 Balls) (Feeder Station Only & No Preload)", 4);
-            routineChooser.addOption("10 Ball Auto (Steals 2 when starting from Feeder Station, otherwise takes from Switch)", 5);
-            routineChooser.addOption("Score Trench (8 Balls)", 6);
-            routineChooser.addOption("Score Generator Switch (8 Balls)", 7);
-            routineChooser.addOption("Steal Trench (5 Balls) (No Preload & Recommended Start at Feeder Station)", 8);
-            routineChooser.addOption("Score and Run (3 Balls)", 9);
-            routineChooser.addOption("Score Wide and Run (3 Balls)", 10);
-            routineChooser.addOption("Run Only (0 Balls) (No Preload)", 11);
-            routineChooser.addOption("Everybot (0 Balls)", 12);*/
-            routineChooser.addOption("Drive from initiation line", 13);
-            routineChooser.addOption("Simple Score (only from Power Port)", 14);
-            routineChooser.addOption("Spin (This auto is a joke, do not choose it unless you don't want to score any points)", 15); // I'm leaving this in
-            routineChooser.setDefaultOption("Do Nothing", 16);
+            /*autoChooser.addRoutine("Steal 2, Score Trench, and Generator Switch (15 Balls) (Feeder Station Only)", 0);
+            autoChooser.addRoutine("Steal Trench, Score Trench, and Generator Switch (15 Balls) (Feeder Station Only & No Preload)", 1);
+            autoChooser.addRoutine("Score Trench and Generator Switch (13 Balls) ", 2);
+            autoChooser.addRoutine("Steal Trench and Score Generator Switch (10 Balls) (Feeder Station Only & No Preload)", 3);
+            autoChooser.addRoutine("Steal Trench and Score Trench (10 Balls) (Feeder Station Only & No Preload)", 4);
+            autoChooser.addRoutine("10 Ball Auto (Steals 2 when starting from Feeder Station, otherwise takes from Switch)", 5);
+            autoChooser.addRoutine("Score Trench (8 Balls)", 6);
+            autoChooser.addRoutine("Score Generator Switch (8 Balls)", 7);
+            autoChooser.addRoutine("Steal Trench (5 Balls) (No Preload & Recommended Start at Feeder Station)", 8);
+            autoChooser.addRoutine("Score and Run (3 Balls)", 9);
+            autoChooser.addRoutine("Score Wide and Run (3 Balls)", 10);
+            autoChooser.addRoutine("Run Only (0 Balls) (No Preload)", 11);
+            autoChooser.addRoutine("Everybot (0 Balls)", 12);*/
+            autoChooser.addRoutine("Drive from initiation line", 13);
+            autoChooser.addRoutine("Simple Score (only from Power Port)", 14);
+            autoChooser.addRoutine("Spin (This auto is a joke, do not choose it unless you don't want to score any points)", 15); // I'm leaving this in
+            autoChooser.setDefaultRoutine("Do Nothing", 16);
 
             autoChooserList.add(positionChooser);
         }
 
-        public int getStartingPosition() {
-            return positionChooser.getSelected();
-        }
-
-        public int getRoutine() {
-            return routineChooser.getSelected();
-        }
-
         public void periodic() {
-            chosenAuto.forceSetString((getPushing() ? "Push then " : "") + startingPos[positionChooser.getSelected()] + " " + routines[routineChooser.getSelected()]);
+            chosenAuto = (getPushing() ? "Push then " : "") + startingPos[positionChooser.getSelected()] + " " + routines[routineChooser.getSelected()];
         }
 
         public double getWait1() {
