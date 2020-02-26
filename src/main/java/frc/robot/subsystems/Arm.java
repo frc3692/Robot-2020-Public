@@ -46,9 +46,9 @@ public class Arm extends SubsystemBase {
 
     double speed = 0;
     if (holding) {
-      if(m_enc.get() > ArmConstants.kFallPos) {
+      if(m_enc.get() > ArmConstants.kFallPos && setpoint > 0) {
         speed = ArmConstants.kHelpSpeed;
-      } else if(m_enc.get() < ArmConstants.kRestPos) {
+      } else if(m_enc.get() < ArmConstants.kRestPos && setpoint < 0) {
         speed = -ArmConstants.kHelpSpeed;
       }
     } else {
@@ -70,8 +70,8 @@ public class Arm extends SubsystemBase {
     SmartDashboard.putNumber("Arm Speed", speed);
   }
 
-  public void forceDown() {
-    m_forceDown = true;
+  public void forceDown(boolean enabled) {
+    m_forceDown = enabled;
   }
 
   public void setSetpoint(double setpoint) {
