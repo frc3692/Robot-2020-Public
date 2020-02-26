@@ -147,7 +147,6 @@ public class Drivetrain extends SubsystemBase {
     if (RobotContainer.Config.Inverted)
       xSpeed = -xSpeed;
 
-    // Copied from arcade drive
     xSpeed = MathUtil.clamp(xSpeed, -1.0, 1.0);
 
     zRotation = MathUtil.clamp(zRotation, -1.0, 1.0);
@@ -211,6 +210,22 @@ public class Drivetrain extends SubsystemBase {
         && m_leftEncoder.getPosition() <= (m_leftSetpoint + m_leftPID.getSmartMotionAllowedClosedLoopError(1)))
         && (m_rightEncoder.getPosition() >= (m_rightSetpoint - m_rightPID.getSmartMotionAllowedClosedLoopError(1))
             && m_rightEncoder.getPosition() <= (m_rightSetpoint + m_rightPID.getSmartMotionAllowedClosedLoopError(1)));
+  }
+
+  public double getLeftDist() {
+    return m_leftEncoder.getPosition();
+  }
+
+  public double getRightDist() {
+    return m_rightEncoder.getPosition();
+  }
+
+  public double getLeftVel() {
+    return m_leftEncoder.getVelocity();
+  }
+
+  public double getRightVel() {
+    return m_rightEncoder.getVelocity();
   }
 
   public void slow(boolean enabled) {

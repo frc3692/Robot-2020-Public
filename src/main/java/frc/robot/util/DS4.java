@@ -8,23 +8,21 @@
 package frc.robot.util;
 
 import java.util.EnumMap;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SelectCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.Button;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 public class DS4 extends Joystick implements AutoCloseable {
-	public enum DSButton {
-		sq(1), x(2), o(3), tri(4), lb(5), rb(6), lt(7), rt(8), share(9), options(10), psBtn(13), povNone(-1, true),
-		povU(0, true), povUR(45, true), povR(90, true), povDR(135, true), povD(180, true), povDL(225, true),
-		povL(270, true), povUL(315, true);
+	public static enum DSButton {
+		kSq(1), kX(2), kO(3), kTri(4), kLB(5), kRB(6), kLT(7), kRT(8), kShare(9), kOptions(10), kPS(13), kPOVNone(-1, true),
+		kUp(0, true), kUpRight(45, true), kRight(90, true), kDownRight(135, true), kDown(180, true), kDownLeft(225, true),
+		kLeft(270, true), kUpLeft(315, true);
 
 		private int id;
 		private boolean isPov = false;
@@ -47,8 +45,8 @@ public class DS4 extends Joystick implements AutoCloseable {
 		}
 	}
 
-	public enum DSAxis {
-		lx(0), ly(1), rx(2), rt(3), lt(4), ry(5);
+	public static enum DSAxis {
+		kLX(0), kLY(1), kRX(2), kRT(3), kLT(4), kRY(5);
 
 		private int id;
 
@@ -61,15 +59,14 @@ public class DS4 extends Joystick implements AutoCloseable {
 		}
 	}
 
-	public enum CommandSet {
-		primary, secondary
+	public static enum CommandSet {
+		kPrimary, kSecondary
 	}
 
 	private double deadband = 0.02;
 	private EnumMap<DSButton, Button> buttons;
 
-	private DSButton mod1;
-	private CommandSet commandSet = CommandSet.primary;
+	private CommandSet m_commandSet = CommandSet.kPrimary;
 
 	public DS4(int port) {
 		super(port);
@@ -81,24 +78,18 @@ public class DS4 extends Joystick implements AutoCloseable {
 		this.deadband = deadband;
 	}
 
+
 	public void setMod(DSButton btn) {
-		mod1 = btn;
 		getBtn(btn).whileHeld(
-				new StartEndCommand(() -> commandSet = CommandSet.secondary, () -> commandSet = CommandSet.primary));
+				new StartEndCommand(() -> m_commandSet = CommandSet.kSecondary, () -> m_commandSet = CommandSet.kPrimary));
 	}
 
 	public Command getDualModeCommand(Command primary, Command secondary) {
-		return new SelectCommand(
-				Map.ofEntries(Map.entry(CommandSet.primary, primary), Map.entry(CommandSet.secondary, secondary)),
-				this::getCommandSet);
+		return new ConditionalCommand(primary, secondary, () -> m_commandSet == CommandSet.kPrimary);
 	}
 
 	public Command getDualModeCommand(Runnable primary, Runnable secondary) {
 		return getDualModeCommand(new InstantCommand(primary), new InstantCommand(secondary));
-	}
-
-	public CommandSet getCommandSet() {
-		return commandSet;
 	}
 
 	public Button getBtn(DSButton b) {
@@ -219,11 +210,11 @@ public class DS4 extends Joystick implements AutoCloseable {
 	}
 
 	public double getNetTriggers() {
-		return getRawAxis(DSAxis.rt) - getRawAxis(DSAxis.lt);
+		return getRawAxis(DSAxis.kRT) - getRawAxis(DSAxis.kLT);
 	}
 
 	public double getNetTriggers(boolean applyDeadband) {
-		return getRawAxis(DSAxis.rt, applyDeadband) - getRawAxis(DSAxis.lt, applyDeadband);
+		return getRawAxis(DSAxis.kRT, applyDeadband) - getRawAxis(DSAxis.kLT, applyDeadband);
 	}
 
 	private double applyDeadband(double value) {

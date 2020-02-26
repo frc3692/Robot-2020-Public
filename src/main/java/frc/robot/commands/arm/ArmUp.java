@@ -5,47 +5,42 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package frc.robot.commands.auto;
+package frc.robot.commands.arm;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants.DriveConstants;
-import frc.robot.subsystems.Drivetrain;
+import frc.robot.Constants.ArmConstants;
+import frc.robot.subsystems.Arm;
 
-public class DriveDistance extends CommandBase {
-  private double dist;
-  private Drivetrain dt;
+public class ArmUp extends CommandBase {
+  private Arm m_arm;
   /**
-   * Creates a new DriveDistance.
+   * Creates a new ArmUp.
    */
-  public DriveDistance(double dist, Drivetrain dt) {
-    this.dist = dist;
+  public ArmUp(Arm arm) {
     // Use addRequirements() here to declare subsystem dependencies.
-    this.dt = dt;
-    addRequirements(dt);
+    m_arm = arm;
+    addRequirements(arm);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    dt.updatePosSetpoint(dist);
+    m_arm.setSetpoint(1);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    dt.distDrive(dist);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    dt.stop();
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    //                            Prevent this from running until the robot is characterized
-    return dt.atPosSetpoint() || DriveConstants.kPDriveVel == 0;
+    return m_arm.getPosition() > ArmConstants.kUpPos;
   }
 }

@@ -10,24 +10,24 @@ package frc.robot.util.pneumatics;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 
 public enum SolState {
-	fwd, rev;
+	kFwd, kRev;
 
 	public static SolState get(Value v) {
 		switch (v) {
 		case kForward:
-			return SolState.fwd;
+			return SolState.kFwd;
 		case kReverse:
-			return SolState.rev;
+			return SolState.kRev;
 		default:
 			return null;
 		}
 	}
 
 	public static SolState get(boolean b) {
-		return (b) ? SolState.fwd : SolState.rev;
+		return (b) ? SolState.kFwd : SolState.kRev;
 	}
 
 	public SolState invert() {
-		return ((this == SolState.rev) ? SolState.fwd : SolState.rev);
+		return ((this == SolState.kRev) ? SolState.kFwd : SolState.kRev);
 	}
 }

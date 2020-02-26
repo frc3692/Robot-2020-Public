@@ -21,11 +21,11 @@ public abstract class SolWrapper {
 	}
 
 	public void fwd() {
-		set(SolState.fwd);
+		set(SolState.kFwd);
 	}
 
 	public void rev() {
-		set(SolState.rev);
+		set(SolState.kRev);
 	}
 
 	public SolState getState() {

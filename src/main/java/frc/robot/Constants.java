@@ -46,6 +46,7 @@ public final class Constants {
         public static final double kEncDPR = kWheelCirc / kGearRatio;
 
         // Auto
+        public static final double kAutoSpeed = 0.5;
         // TODO: Find max accel and vel
         public static final double kMaxAccel = 6;
         public static final double kMaxVel = 3;
@@ -81,6 +82,10 @@ public final class Constants {
         public static final double kDropSpeed = 0.15;
         public static final double kLiftSpeed = -0.3;
         public static final double kHelpSpeed = -0.15;
+
+        public static final double kUpPos = 0.22;
+        public static final double kDownPos = 0.07;
+        public static final double kScorePos = 0.2;
     }
 
     public static final class IntakeConstants {

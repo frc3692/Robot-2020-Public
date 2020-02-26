@@ -17,11 +17,11 @@ public class SingleWrapper extends SolWrapper {
 		base = (Solenoid)getBase();
 
 		base.set(false);
-		set(SolState.rev);
+		set(SolState.kRev);
 	}
 
 	public void set(SolState state) {
 		setState(state);
-		base.set(state == SolState.fwd);
+		base.set(state == SolState.kFwd);
 	}
 }
