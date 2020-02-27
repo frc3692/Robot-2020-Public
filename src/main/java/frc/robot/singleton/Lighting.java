@@ -8,7 +8,7 @@
 package frc.robot.singleton;
 
 import edu.wpi.first.wpilibj.Spark;
-import frc.robot.Constants.MiscConstants;
+import frc.robot.Constants.LightingConstants;
 import frc.robot.singleton.SB.LightingDat;
 
 public class Lighting {
@@ -21,7 +21,7 @@ public class Lighting {
     return lighting;
   }
 
-  private final Spark Blinkin = new Spark(MiscConstants.kBlinkinPort);
+  private final Spark Blinkin = new Spark(LightingConstants.kBlinkinPort);
   private int mode = 1;
   private double val = -0.99;
 
@@ -30,7 +30,7 @@ public class Lighting {
     int sbMode = LightingDat.getInstance().getMode();
     if (mode != sbMode) {
       if (sbMode > 100 || sbMode < 1) {
-        LightingDat.getInstance().update((Number) mode);
+        LightingDat.getInstance().update(mode);
       } else {
         mode = sbMode;
         updateVal(mode);
@@ -41,9 +41,11 @@ public class Lighting {
   }
 
   public void setMode(int mode) {
-    this.mode = mode;
-    LightingDat.getInstance().update(mode);
-    updateVal(mode);
+    if(!LightingDat.getInstance().isFrozen()) {
+      this.mode = mode;
+      LightingDat.getInstance().update(mode);
+      updateVal(mode);
+    }
   }
 
   private void updateVal(int mode) {

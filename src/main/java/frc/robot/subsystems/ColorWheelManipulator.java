@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ColorWheelConstants;
+import io.github.oblarg.oblog.annotations.Log;
 
 public class ColorWheelManipulator extends SubsystemBase {
   private CANSparkMax m_liftMotor = new CANSparkMax(ColorWheelConstants.kLiftMotor, MotorType.kBrushless);
@@ -34,6 +35,10 @@ public class ColorWheelManipulator extends SubsystemBase {
   private final Color kGreenTarget = ColorMatch.makeColor(0.197, 0.561, 0.240);
   private final Color kRedTarget = ColorMatch.makeColor(0.561, 0.232, 0.114);
   private final Color kYellowTarget = ColorMatch.makeColor(0.361, 0.524, 0.113);
+
+  @Log
+  private String colorString = "";
+
   /**
    * Creates a new ColorWheelActuator.
    */
@@ -59,26 +64,25 @@ public class ColorWheelManipulator extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-  
-    Color detectedColor = m_colorSensor.getColor();
-    
-    String colorString;
-    ColorMatchResult match = m_matcher.matchClosestColor(detectedColor);
+    if (m_colorSensor.getProximity() < 1500) {
+      Color detectedColor = m_colorSensor.getColor();
 
-    if (match.color == kBlueTarget) {
-      colorString = "Blue";
-    } else if (match.color == kRedTarget) {
-      colorString = "Red";
-    } else if (match.color == kGreenTarget) {
-      colorString = "Green";
-    } else if (match.color == kYellowTarget) {
-      colorString = "Yellow";
+      ColorMatchResult match = m_matcher.matchClosestColor(detectedColor);
+
+      if (match.color == kBlueTarget) {
+        colorString = "Blue";
+      } else if (match.color == kRedTarget) {
+        colorString = "Red";
+      } else if (match.color == kGreenTarget) {
+        colorString = "Green";
+      } else if (match.color == kYellowTarget) {
+        colorString = "Yellow";
+      } else {
+        colorString = "Unknown";
+      }
     } else {
-      colorString = "Unknown";
+      colorString = "Not in range";
     }
-
-
-    //SmartDashboard.putString("Color", colorString);
   }
 
   public void setLift(double speed) {
@@ -87,11 +91,12 @@ public class ColorWheelManipulator extends SubsystemBase {
   }
 
   public void setWheel(double speed) {
-    //if(speed == 0) {
-    //  m_wheelMotor.set(0);
-    //} else {
-      m_wheelPID.setReference(speed * ColorWheelConstants.kMotorSpeed, ControlType.kVelocity, 0, ColorWheelConstants.kFeedforward.calculate(speed));
-    //}
+    // if(speed == 0) {
+    // m_wheelMotor.set(0);
+    // } else {
+    m_wheelPID.setReference(speed * ColorWheelConstants.kMotorSpeed, ControlType.kVelocity, 0,
+        ColorWheelConstants.kFeedforward.calculate(speed));
+    // }
     SmartDashboard.putNumber("Setpoint", speed * ColorWheelConstants.kMotorSpeed);
   }
 

@@ -21,8 +21,8 @@ import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpiutil.math.MathUtil;
-import frc.robot.singleton.SB.DriveDat;
 import frc.robot.singleton.Gyro;
+import io.github.oblarg.oblog.annotations.Log;
 import frc.robot.RobotContainer;
 import frc.robot.Constants.DriveConstants;
 
@@ -47,6 +47,9 @@ public class Drivetrain extends SubsystemBase {
       Rotation2d.fromDegrees(Gyro.getInstance().getHeading()));
 
   private boolean slow = false, boost = false;
+
+  @Log.Graph
+  private double FLAmps = 0, FRAmps = 0, BLAmps = 0, BRAmps = 0;
 
   private double m_leftSetpoint = 0, m_rightSetpoint = 0;
 
@@ -100,10 +103,6 @@ public class Drivetrain extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    RobotContainer.Config.SlowSpd = DriveDat.getInstance().getSlowSpeed();
-    RobotContainer.Config.NormalSpd = DriveDat.getInstance().getNormalSpeed();
-    RobotContainer.Config.BoostSpd = DriveDat.getInstance().getBoostSpeed();
-
     double mult = RobotContainer.Config.NormalSpd;
 
     if (slow) {
@@ -114,11 +113,13 @@ public class Drivetrain extends SubsystemBase {
 
     m_drive.setMaxOutput(mult);
 
-    DriveDat.getInstance().update(mult, boost, slow, m_frontLeft.getOutputCurrent(), m_frontRight.getOutputCurrent(),
-        m_backLeft.getOutputCurrent(), m_backRight.getOutputCurrent());
-
     m_odometry.update(Rotation2d.fromDegrees(Gyro.getInstance().getHeading()), m_leftEncoder.getPosition(),
         m_rightEncoder.getPosition());
+
+    FLAmps = m_frontLeft.getOutputCurrent();
+    FRAmps = m_frontRight.getOutputCurrent();
+    BLAmps = m_backLeft.getOutputCurrent();
+    BRAmps = m_backRight.getOutputCurrent();
   }
 
   public void arcadeDrive(double xSpeed, double zRotation) {

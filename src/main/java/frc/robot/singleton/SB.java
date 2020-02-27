@@ -7,23 +7,18 @@
 
 package frc.robot.singleton;
 
-import java.util.Map;
-
 import frc.robot.util.Debug;
-import frc.robot.RobotContainer;
-
+import edu.wpi.cscore.VideoSource;
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.shuffleboard.LayoutType;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 
-import io.github.oblarg.oblog;
-import io.github.oblarg.oblog.annotations;
+import io.github.oblarg.oblog.Logger;
+import io.github.oblarg.oblog.Loggable;
+import io.github.oblarg.oblog.annotations.Log;
+import io.github.oblarg.oblog.annotations.Config;
 
 /**
  * Shuffleboard Controller
@@ -41,10 +36,11 @@ public class SB {
             return "Auto";
         }
 
-        private class AutoChooser implements Loggable {
+        private static class AutoChooser implements Loggable {
             private static AutoChooser m_autoChooser = new AutoChooser();
 
-            private AutoChooser {
+            private AutoChooser() {
+                Logger.configureLoggingAndConfig(this, false);
             }
 
             public static AutoChooser getInstance() {
@@ -80,6 +76,11 @@ public class SB {
 
             // Oblog Layout Config
             @Override
+            public String configureLogName() {
+                return "Autonomous Chooser";
+            }
+
+            @Override
             public int[] configureLayoutPosition() {
                 return new int[] {0, 0};
             }
@@ -95,51 +96,78 @@ public class SB {
             }
         }
 
-        private final ShuffleboardLayout autoChooserList = autoTab.getLayout("Autonomous Chooser", BuiltInLayouts.kList).withPosition(0, 0).withSize(2, 2);
-        private final ShuffleboardLayout waitList = autoTab.getLayout("Wait times", BuiltInLayouts.kList).withPosition(0, 2).withSize(2, 2);
+        private static class WaitTimes implements Loggable {
+            private static WaitTimes waitTimes = new WaitTimes();
 
-        @log(name = "Chosen Auto", rowIndex = 2, columnIndex = 0, width = 3, height = 1)
-        private final String chosenAuto = "Do Nothing";
-        private final NetworkTableEntry push = autoTab.add("Push another bot?", false).withWidget(BuiltInWidgets.kToggleButton).withPosition(3, 1).withSize(2, 1).getEntry();
+            private WaitTimes() {
+            }
 
-        private final NetworkTableEntry wait1 = waitList.add("Wait 1", 0).getEntry();
-        private final NetworkTableEntry wait2 = waitList.add("Wait 2", 0).getEntry();
-        private final NetworkTableEntry wait3 = waitList.add("Wait 3", 0).getEntry();
-        private final SendableChooser<Integer> positionChooser = new SendableChooser<>(), routineChooser = new SendableChooser<>();
+            public static WaitTimes getInstance() {
+                return waitTimes;
+            }
 
-        private final String[] startingPos = {
-            "Power Port Wall",
-            "Power Port",
-            "Center",
-            "Feeder Station",
-            "Feeder Station Wall"
-        },
-        routines = {
-            "Steal 2 & Score 15",
-            "Steal All & Score 15",
-            "Score Trench & Generator Switch Balls",
-            "Steal All & Score Generator Switch Balls",
-            "Steal All & Score Trench",
-            "10 Ball",
-            "Score Trench",
-            "Score Generator Switch Balls",
-            "Steal All & Score",
-            "Score and Run",
-            "Score Wide and Run",
-            "Run Only",
-            "Everybot",
-            "Move from Initiation Line",
-            "Simple Score",
-            "Spin",
-            "Do Nothing"
-        };
+            @Log(name = "Wait 1")
+            private double wait1 = 0;
+            @Log(name = "Wait 2")
+            private double wait2 = 0;
+            @Log(name = "Wait 3")
+            private double wait3 = 0;
+
+            public double getWait1() {
+                return wait1;
+            }
+
+            public double getWait2() {
+                return wait2;
+            }
+
+            public double getWait3() {
+                return wait3;
+            }
+
+            // Oblog Layout Config
+            @Override
+            public String configureLogName() {
+                return "Wait Time";
+            }
+
+            @Override
+            public int[] configureLayoutPosition() {
+                return new int[] { 0, 2 };
+            }
+
+            @Override
+            public int[] configureLayoutSize() {
+                return new int[] { 2, 2 };
+            }
+
+            @Override
+            public LayoutType configureLayoutType() {
+                return BuiltInLayouts.kList;
+            }
+        }
+
+        @Log(name = "Chosen Auto", rowIndex = 2, columnIndex = 0, width = 3, height = 1)
+        private String chosenAuto = "Do Nothing";
+
+        private boolean push = false;
+
+        private final String[] startingPos = { "Power Port Wall", "Power Port", "Center", "Feeder Station",
+                "Feeder Station Wall" },
+                routines = { "Steal 2 & Score 15", "Steal All & Score 15", "Score Trench & Generator Switch Balls",
+                        "Steal All & Score Generator Switch Balls", "Steal All & Score Trench", "10 Ball",
+                        "Score Trench", "Score Generator Switch Balls", "Steal All & Score", "Score and Run",
+                        "Score Wide and Run", "Run Only", "Everybot", "Move from Initiation Line", "Simple Score",
+                        "Spin", "Do Nothing" };
+        private AutoChooser autoChooser = AutoChooser.getInstance();
+        private WaitTimes waitTimes = WaitTimes.getInstance();
+
         private AutonDat() {
             if(!DriverStation.getInstance().isFMSAttached()) {
                 // Put in test autos
             }
 
             Debug.log("Auto");
-            AutoChooser autoChooser = AutoChooser.getInstance();
 
             autoChooser.addPosition("Power Port Wall", 0);
             autoChooser.addPosition("Power Port", 1);
@@ -165,126 +193,93 @@ public class SB {
             autoChooser.addRoutine("Simple Score (only from Power Port)", 14);
             autoChooser.addRoutine("Spin (This auto is a joke, do not choose it unless you don't want to score any points)", 15); // I'm leaving this in
             autoChooser.setDefaultRoutine("Do Nothing", 16);
-
-            autoChooserList.add(positionChooser);
         }
 
         public void periodic() {
-            chosenAuto = (getPushing() ? "Push then " : "") + startingPos[positionChooser.getSelected()] + " " + routines[routineChooser.getSelected()];
+            chosenAuto = (getPushing() ? "Push then " : "") + startingPos[autoChooser.getPosition()] + " " + routines[autoChooser.getRoutine()];
         }
 
         public double getWait1() {
-            return wait1.getDouble(0);
+            return waitTimes.getWait1();
         }
 
         public double getWait2() {
-            return wait2.getDouble(0);
+            return waitTimes.getWait2();
         }
 
         public double getWait3() {
-            return wait3.getDouble(0);
+            return waitTimes.getWait3();
         }
 
         public boolean getPushing() {
-            return push.getBoolean(false);
+            return push;
+        }
+
+        public int getStartingPosition() {
+            return autoChooser.getPosition();
+        }
+
+        public int getRoutine() {
+            return autoChooser.getRoutine();
+        }
+
+        @Config.ToggleSwitch(name = "Push another bot?", rowIndex = 3, columnIndex = 1, width = 2, height = 1)
+        private void setPush(boolean push) {
+            this.push = push;
         }
     }
 
-    public static class DriveDat {
-        private final static DriveDat drive = new DriveDat();
-
-        public static DriveDat getInstance() {
-            return drive;
-        }
-
-        private final ShuffleboardTab driveTab = Shuffleboard.getTab("Drive");
-
-        private final ShuffleboardLayout driveSpeeds = driveTab.getLayout("Drive Speeds", BuiltInLayouts.kList)
-                .withPosition(0, 0).withSize(1, 2);
-        private final ShuffleboardLayout driveData = driveTab.getLayout("Misc Data", BuiltInLayouts.kList)
-                .withPosition(2, 0).withSize(1, 2);
-        private final ShuffleboardLayout driveAmps = driveTab.getLayout("Amperage", BuiltInLayouts.kGrid)
-                .withProperties(Map.of("rows", 2, "columns", 2))
-                .withPosition(0, 2).withSize(3, 4);
-
-        private final NetworkTableEntry Slow = driveSpeeds.addPersistent("Slow Speed", 0.5).getEntry();
-        private final NetworkTableEntry Normal = driveSpeeds.addPersistent("Normal Speed", 0.75).getEntry();
-        private final NetworkTableEntry Boost = driveSpeeds.addPersistent("Boost Speed", 1).getEntry();
-
-        private final NetworkTableEntry Mult = driveData.addPersistent("Mult", 0.75)
-                .withProperties(Map.of("min", 0, "max", 1)).getEntry();
-        private final NetworkTableEntry Boosted = driveData.addPersistent("Boosted", false)
-                .withWidget(BuiltInWidgets.kBooleanBox).getEntry();
-        private final NetworkTableEntry Slowed = driveData.addPersistent("Slowed", false)
-                .withWidget(BuiltInWidgets.kBooleanBox).getEntry();
-
-        private final NetworkTableEntry FLAmperage = driveAmps.addPersistent("FL Amp Draw", 0)
-                .withWidget(BuiltInWidgets.kGraph).withPosition(0, 0).getEntry();
-        private final NetworkTableEntry FRAmperage = driveAmps.addPersistent("FR Amp Draw", 0)
-                .withWidget(BuiltInWidgets.kGraph).withPosition(1, 0).getEntry();
-        private final NetworkTableEntry BLAmperage = driveAmps.addPersistent("BL Amp Draw", 0)
-                .withWidget(BuiltInWidgets.kGraph).withPosition(0, 1).getEntry();
-        private final NetworkTableEntry BRAmperage = driveAmps.addPersistent("BR Amp Draw", 0)
-                .withWidget(BuiltInWidgets.kGraph).withPosition(1, 1).getEntry();
-
-        private DriveDat() {
-        }
-
-        public double getSlowSpeed() {
-            return Slow.getDouble(0.5);
-        }
-
-        public double getNormalSpeed() {
-            return Normal.getDouble(0.75);
-        }
-
-        public double getBoostSpeed() {
-            return Boost.getDouble(1);
-        }
-
-        public void update(double mult, boolean boosted, boolean slowed, Number flamp, Number framp, Number blamp,
-                Number bramp) {
-            Mult.setDouble(mult);
-            Boosted.setBoolean(boosted);
-            Slowed.setBoolean(slowed);
-
-            FLAmperage.setNumber(flamp);
-            FRAmperage.setNumber(framp);
-            BLAmperage.setNumber(blamp);
-            BRAmperage.setNumber(bramp);
-        }
-
-        public void periodic() {
-            RobotContainer.Config.BoostSpd = getBoostSpeed();
-            RobotContainer.Config.NormalSpd = getNormalSpeed();
-            RobotContainer.Config.SlowSpd = getSlowSpeed();
-        }
-    }
-
-    public static class LightingDat {
+    public static class LightingDat implements Loggable {
         private static LightingDat lighting = new LightingDat();
 
         public static LightingDat getInstance() {
             return lighting;
         }
 
-        private final ShuffleboardTab lightingTab = Shuffleboard.getTab("Lighting");
-        private final NetworkTableEntry Mode = lightingTab.addPersistent("Mode", 1).getEntry();
-        private final NetworkTableEntry Freeze = lightingTab.addPersistent("Freeze Mode", false).getEntry();
+        @Config(name = "Mode")
+        private int mode = 1;
+        private boolean frozen = false;
 
         private LightingDat() {
+            Logger.configureLoggingAndConfig(this, false);
         }
 
         public int getMode() {
-            return Mode.getNumber(1).intValue();
+            return mode;
         }
 
-        public boolean getFrozen() {
-            return Freeze.getBoolean(false);
+        public boolean isFrozen() {
+            return frozen;
         }
 
-        public void update(Number mode) {
-            Mode.setNumber(mode);
+        public void update(int mode) {
+            this.mode = mode;
+        }
+
+        @Config.ToggleSwitch(name = "Freeze Lighting")
+        public void freeze(boolean enabled) {
+            frozen = enabled;
+        }
+    }
+
+    public static class Cameras implements Loggable {
+        private static Cameras cameras = new Cameras();
+
+        public static Cameras getInstance() {
+            return cameras;
+        }
+
+        @Log.CameraStream
+        private VideoSource cam1 = CameraServer.getInstance().startAutomaticCapture(0), cam2 = CameraServer.getInstance().startAutomaticCapture(1);
+        
+        private Cameras() {
+            Logger.configureLogging(this);
+
+            cam1.setFPS(20);
+            cam1.setResolution(320, 240);
+
+            cam2.setFPS(20);
+            cam2.setResolution(320, 240);
         }
     }
 }

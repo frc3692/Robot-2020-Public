@@ -7,16 +7,25 @@
 
 package frc.robot.subsystems;
 
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import frc.robot.Constants.LiftConstants;
 import frc.robot.RobotContainer.RobotState;
+import frc.robot.util.pneumatics.DoubleWrapper;
 import frc.robot.util.pneumatics.SingleWrapper;
 import frc.robot.util.pneumatics.SolState;
 import frc.robot.util.pneumatics.SolWrapper;
 
 public class Lift extends SubsystemBase {
-  private SolWrapper m_liftEngage = new SingleWrapper(LiftConstants.kRelease), stage1, stage2, stage3;
+  private SolWrapper m_liftEngage = new SingleWrapper(LiftConstants.kEngageF),
+      stage1 = new DoubleWrapper(LiftConstants.kStage1F, LiftConstants.kStage1R),
+      stage2 = new DoubleWrapper(LiftConstants.kStage2F, LiftConstants.kStage2R),
+      stage3 = new DoubleWrapper(LiftConstants.kStage3F, LiftConstants.kStage3R);
+  private CANSparkMax m_winch = new CANSparkMax(LiftConstants.kWinch, MotorType.kBrushless);
+
   /**
    * Creates a new Climber.
    */
@@ -27,7 +36,7 @@ public class Lift extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    if(RobotContainer.State == RobotState.kEndgame) {
+    if (RobotContainer.State == RobotState.kEndgame) {
       m_liftEngage.fwd();
       stage1.set(stage1.getState());
       stage2.set(stage2.getState());
@@ -43,11 +52,16 @@ public class Lift extends SubsystemBase {
   public void initEndgame(Arm arm) {
     RobotContainer.State = RobotState.kEndgame;
     arm.forceDown(true);
+    stage1.fwd();
   }
 
   public void undoEndgame(Arm arm) {
     RobotContainer.State = RobotState.kNormal;
     arm.forceDown(false);
+  }
+
+  public void runWinch(double speed) {
+    m_winch.set(speed * LiftConstants.kWinchMaxSpeed);
   }
 
   public void engageStage1() {

@@ -12,7 +12,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.singleton.Lighting;
 import frc.robot.singleton.SB;
-import io.github.oblarg.oblog;
+
+import io.github.oblarg.oblog.Loggable;
+import io.github.oblarg.oblog.Logger;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -21,7 +23,7 @@ import io.github.oblarg.oblog;
  * creating this project, you must also update the build.gradle file in the
  * project.
  */
-public class Robot extends TimedRobot {
+public class Robot extends TimedRobot implements Loggable {
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
@@ -129,5 +131,11 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void testPeriodic() {
+  }
+
+  // Oblog
+  @Override
+  public String configureLogName() {
+    return "Diagnostics";
   }
 }
