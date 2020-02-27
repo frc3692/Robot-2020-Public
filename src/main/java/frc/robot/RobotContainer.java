@@ -144,14 +144,18 @@ public class RobotContainer {
 
     m_mechanismController.getBtn(DSButton.kPS).whenPressed(getStateDependantCommand(
         new InstantCommand(() -> m_lift.initEndgame(m_arm)), new InstantCommand(() -> m_lift.undoEndgame(m_arm))));
-  }
+      }
 
   private Command getStateDependantCommand(Command normal, Command lift) {
-    return new ConditionalCommand(normal, lift, () -> State == RobotState.kNormal);
+    return new ConditionalCommand(normal, lift, this::isInNormal);
   }
 
   private Command getStateDependantCommand(Command normal) {
     return getStateDependantCommand(normal, new InstantCommand());
+  }
+
+  private boolean isInNormal() {
+    return State == RobotState.kNormal;
   }
 
   /**

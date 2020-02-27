@@ -112,7 +112,17 @@ public final class Constants {
     }
 
     public static final class LiftConstants {
-        public static final int kRelease = 0;
+        public static final int kEngageF = 0;
+        public static final int kEngageR = 1;
+        public static final int kStage1F = 2;
+        public static final int kStage1R = 3;
+        public static final int kStage2F = 4;
+        public static final int kStage2R = 5;
+        public static final int kStage3F = 6;
+        public static final int kStage3R = 7;
+
+        public static final int kWinch = 8;
+        public static final double kWinchMaxSpeed = 1;
     }
 
     public static final class LightingConstants {
