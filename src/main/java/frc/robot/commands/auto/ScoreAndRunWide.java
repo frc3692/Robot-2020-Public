@@ -37,7 +37,7 @@ public class ScoreAndRunWide extends CommandBase {
         .andThen(new RunCommand(() -> intake.out(), intake).withTimeout(1)).andThen(ramseteFromTrajectory(trajectories.getScoreRun()))
         .andThen(ramseteFromTrajectory(trajectories.getScoreRun()).raceWith(new RunCommand(() -> intake.in(), intake)));
 
-    Command wait1 = new WaitCommand(SB.AutonDat.getInstance().getWait1());
+    Command wait1 = new WaitCommand(SB.AutoDat.getInstance().getWait1());
     switch (startingPos) {
       case 0:
         // Power Port Wall
