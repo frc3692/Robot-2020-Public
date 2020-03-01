@@ -76,12 +76,12 @@ public final class Constants {
         public static final int kEncCPR = 8192;
 
         public static final double kRestPos = 0.09;
-        public static final double kSpringPos = 0.18;
+        public static final double kSpringPos = 0.2;
         public static final double kFallPos = 0.2;
 
         public static final double kDropSpeed = 0.15;
-        public static final double kLiftSpeed = -0.3;
-        public static final double kHelpSpeed = -0.15;
+        public static final double kLiftSpeed = -0.4;
+        public static final double kHelpSpeed = -0.25;
 
         public static final double kUpPos = 0.22;
         public static final double kDownPos = 0.07;
@@ -112,14 +112,10 @@ public final class Constants {
     }
 
     public static final class LiftConstants {
-        public static final int kEngageF = 0;
-        public static final int kEngageR = 1;
-        public static final int kStage1F = 2;
-        public static final int kStage1R = 3;
-        public static final int kStage2F = 4;
-        public static final int kStage2R = 5;
-        public static final int kStage3F = 6;
-        public static final int kStage3R = 7;
+        public static final int kStage1F = 0;
+        public static final int kStage1R = 1;
+        public static final int kStage2F = 2;
+        public static final int kStage2R = 3;
 
         public static final int kWinch = 8;
         public static final double kWinchMaxSpeed = 1;
