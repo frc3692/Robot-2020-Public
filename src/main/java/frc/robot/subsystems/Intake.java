@@ -7,20 +7,27 @@
 
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.IdleMode;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.IntakeConstants;
 
 public class Intake extends SubsystemBase {
-  private final TalonSRX m_wheels = new TalonSRX(IntakeConstants.kMotor);
+  private final CANSparkMax m_motor = new CANSparkMax(IntakeConstants.kMotor, MotorType.kBrushless);
 
   /**
    * Creates a new Intake.
    */
   public Intake() {
+    m_motor.restoreFactoryDefaults();
+    m_motor.clearFaults();
+    m_motor.setMotorType(MotorType.kBrushless);
+    m_motor.setSmartCurrentLimit(40);
+    m_motor.setIdleMode(IdleMode.kBrake);
 
+    m_motor.burnFlash();
   }
 
   @Override
@@ -29,14 +36,14 @@ public class Intake extends SubsystemBase {
   }
 
   public void in() {
-    m_wheels.set(ControlMode.PercentOutput, IntakeConstants.kSpeed);
+    m_motor.set(IntakeConstants.kSpeed);
   }
 
   public void out() {
-    m_wheels.set(ControlMode.PercentOutput, -IntakeConstants.kSpeed);
+    m_motor.set(-IntakeConstants.kSpeed);
   }
 
   public void set(double speed) {
-    m_wheels.set(ControlMode.PercentOutput, speed * IntakeConstants.kSpeed);
+    m_motor.set(speed * IntakeConstants.kSpeed);
   }
 }

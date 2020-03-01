@@ -12,7 +12,6 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ArmConstants;
 
@@ -21,7 +20,7 @@ public class Arm extends SubsystemBase {
   private DutyCycleEncoder m_enc = new DutyCycleEncoder(ArmConstants.kEnc);
   private double m_setpoint = 0;
 
-  private boolean m_forceDown = false, holding = true;
+  private boolean m_forceDown = false, holding = false;
 
   /**
    * Creates a new Arm.
@@ -29,17 +28,13 @@ public class Arm extends SubsystemBase {
   public Arm() {
     m_motor.restoreFactoryDefaults();
     m_motor.clearFaults();
-    m_motor.setOpenLoopRampRate(0);
     m_motor.setIdleMode(IdleMode.kBrake);
+
+    m_motor.burnFlash();
   }
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Encoder Pos", m_enc.getDistance());
-    SmartDashboard.putNumber("Arm Amps", m_motor.getOutputCurrent());
-    SmartDashboard.putNumber("Enc vel", m_motor.getEncoder().getVelocity());
-    SmartDashboard.putNumber("Arm Temp", m_motor.getMotorTemperature());
-
     double setpoint = m_setpoint;
     if (m_forceDown)
       setpoint = -1;
@@ -66,8 +61,8 @@ public class Arm extends SubsystemBase {
         speed = ArmConstants.kDropSpeed;
       }
     }
+    
     m_motor.set(speed);
-    SmartDashboard.putNumber("Arm Speed", speed);
   }
 
   public void forceDown(boolean enabled) {

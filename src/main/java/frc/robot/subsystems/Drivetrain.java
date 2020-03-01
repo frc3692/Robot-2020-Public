@@ -46,10 +46,7 @@ public class Drivetrain extends SubsystemBase {
   private final DifferentialDriveOdometry m_odometry = new DifferentialDriveOdometry(
       Rotation2d.fromDegrees(Gyro.getInstance().getHeading()));
 
-  private boolean slow = false, boost = false;
-
-  @Log.Graph
-  private double FLAmps = 0, FRAmps = 0, BLAmps = 0, BRAmps = 0;
+  private boolean m_slow = false, m_boost = false;
 
   private double m_leftSetpoint = 0, m_rightSetpoint = 0;
 
@@ -98,6 +95,11 @@ public class Drivetrain extends SubsystemBase {
     m_rightPID.setP(DriveConstants.kPDriveVel);
     m_rightPID.setSmartMotionMaxAccel(DriveConstants.kMaxAccel, 0);
     m_rightPID.setSmartMotionMaxVelocity(DriveConstants.kMaxVel, 0);
+
+    m_frontLeft.burnFlash();
+    m_frontRight.burnFlash();
+    m_backLeft.burnFlash();
+    m_backRight.burnFlash();
   }
 
   @Override
@@ -105,21 +107,16 @@ public class Drivetrain extends SubsystemBase {
     // This method will be called once per scheduler run
     double mult = RobotContainer.Config.NormalSpd;
 
-    if (slow) {
+    if (m_slow) {
       mult = RobotContainer.Config.SlowSpd;
-    } else if (boost) {
+    } else if (m_boost) {
       mult = RobotContainer.Config.BoostSpd;
     }
 
     m_drive.setMaxOutput(mult);
 
-    m_odometry.update(Rotation2d.fromDegrees(Gyro.getInstance().getHeading()), m_leftEncoder.getPosition(),
-        m_rightEncoder.getPosition());
-
-    FLAmps = m_frontLeft.getOutputCurrent();
-    FRAmps = m_frontRight.getOutputCurrent();
-    BLAmps = m_backLeft.getOutputCurrent();
-    BRAmps = m_backRight.getOutputCurrent();
+    //m_odometry.update(Rotation2d.fromDegrees(Gyro.getInstance().getHeading()), m_leftEncoder.getPosition(),
+    //    m_rightEncoder.getPosition());
   }
 
   public void arcadeDrive(double xSpeed, double zRotation) {
@@ -230,11 +227,11 @@ public class Drivetrain extends SubsystemBase {
   }
 
   public void slow(boolean enabled) {
-    slow = enabled;
+    m_slow = enabled;
   }
 
   public void boost(boolean enabled) {
-    boost = enabled;
+    m_boost = enabled;
   }
 
   public void stop() {
