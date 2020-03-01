@@ -22,6 +22,6 @@ public class SingleWrapper extends SolWrapper {
 
 	public void set(SolState state) {
 		setState(state);
-		base.set(state == SolState.kFwd);
+		base.set(state.getAsBoolean());
 	}
 }

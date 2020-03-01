@@ -23,6 +23,6 @@ public class DoubleWrapper extends SolWrapper {
 
 	public void set(SolState state) {
 		setState(state);
-		base.set((state == SolState.kFwd) ? Value.kForward : Value.kReverse);
+		base.set(state.getAsValue());
 	}
 }

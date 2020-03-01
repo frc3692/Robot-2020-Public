@@ -10,21 +10,40 @@ package frc.robot.util.pneumatics;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 
 public enum SolState {
-	kFwd, kRev;
+	kFwd, kRev, kOff;
 
 	public static SolState get(Value v) {
 		switch (v) {
-		case kForward:
-			return SolState.kFwd;
-		case kReverse:
-			return SolState.kRev;
-		default:
-			return null;
+			case kForward:
+				return SolState.kFwd;
+			case kReverse:
+				return SolState.kRev;
+			case kOff:
+				return SolState.kOff;
+			default:
+				return null;
 		}
 	}
 
 	public static SolState get(boolean b) {
 		return (b) ? SolState.kFwd : SolState.kRev;
+	}
+
+	public Value getAsValue() {
+		switch (this) {
+			case kFwd:
+				return Value.kForward;
+			case kRev:
+				return Value.kReverse;
+			case kOff:
+				return Value.kOff;
+			default:
+				return null;
+		}
+	}
+
+	public boolean getAsBoolean() {
+		return this == kFwd;
 	}
 
 	public SolState invert() {
