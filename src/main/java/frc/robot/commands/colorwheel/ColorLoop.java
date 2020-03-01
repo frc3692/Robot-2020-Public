@@ -10,7 +10,9 @@ package frc.robot.commands.colorwheel;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.util.RobotState;
 import frc.robot.subsystems.ColorWheelManipulator;
+import frc.robot.util.RobotState.State;
 
 public class ColorLoop extends CommandBase {
   private ColorWheelManipulator colorWheelActuator;
@@ -36,8 +38,10 @@ public class ColorLoop extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    colorWheelActuator.setLift(liftSpeed.getAsDouble());
-    colorWheelActuator.setWheel(wheelSpeed.getAsDouble());
+    if (RobotState.getState() == State.kTelop) {
+      colorWheelActuator.setLift(liftSpeed.getAsDouble());
+      colorWheelActuator.setWheel(wheelSpeed.getAsDouble());
+    }
   }
 
   // Called once the command ends or is interrupted.

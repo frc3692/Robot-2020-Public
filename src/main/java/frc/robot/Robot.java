@@ -12,7 +12,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.singleton.Lighting;
 import frc.robot.singleton.SB;
-
+import frc.robot.util.Debug;
+import frc.robot.util.RobotState;
+import frc.robot.util.RobotState.State;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.Logger;
 
@@ -23,7 +25,7 @@ import io.github.oblarg.oblog.Logger;
  * creating this project, you must also update the build.gradle file in the
  * project.
  */
-public class Robot extends TimedRobot implements Loggable {
+public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
@@ -38,7 +40,8 @@ public class Robot extends TimedRobot implements Loggable {
     // and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
-    Logger.configureLoggingAndConfig(this, false);
+    //Logger.configureLoggingAndConfig(this, false);
+    //Logger.setCycleWarningsEnabled(false);
   }
 
   /**
@@ -62,10 +65,10 @@ public class Robot extends TimedRobot implements Loggable {
     CommandScheduler.getInstance().run();
 
     // Update lighting
-    Lighting.getInstance().update();
+    //Lighting.getInstance().update();
 
     // Update shuffleboard
-    Logger.updateEntries();
+    //Logger.updateEntries();
   }
 
   /**
@@ -78,7 +81,7 @@ public class Robot extends TimedRobot implements Loggable {
 
   @Override
   public void disabledPeriodic() {
-    SB.AutonDat.getInstance().periodic();
+      SB.AutoDat.getInstance().periodic();
   }
 
   /**
@@ -87,6 +90,7 @@ public class Robot extends TimedRobot implements Loggable {
    */
   @Override
   public void autonomousInit() {
+    RobotState.updateState(State.kAuto);
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
@@ -111,6 +115,8 @@ public class Robot extends TimedRobot implements Loggable {
     //if (m_autonomousCommand != null) {
     //  m_autonomousCommand.cancel();
     //}
+
+    RobotState.updateState(State.kTelop);
   }
 
   /**
@@ -131,11 +137,5 @@ public class Robot extends TimedRobot implements Loggable {
    */
   @Override
   public void testPeriodic() {
-  }
-
-  // Oblog
-  @Override
-  public String configureLogName() {
-    return "Diagnostics";
   }
 }
