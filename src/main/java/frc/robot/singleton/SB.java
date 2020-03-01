@@ -15,20 +15,29 @@ import edu.wpi.first.wpilibj.shuffleboard.LayoutType;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 
-import io.github.oblarg.oblog.Logger;
 import io.github.oblarg.oblog.Loggable;
+import io.github.oblarg.oblog.Logger;
 import io.github.oblarg.oblog.annotations.Log;
 import io.github.oblarg.oblog.annotations.Config;
 
 /**
  * Shuffleboard Controller
  */
+@Log.Exclude
 public class SB {
-    public static class AutonDat implements Loggable {
-        private final static AutonDat auto = new AutonDat();
+    private SB() {
+    }
+    
+    public static class AutoDat implements Loggable {
+        @Log.Exclude
+        private static AutoDat auto = new AutoDat();
 
-        public static AutonDat getInstance() {
+        public static AutoDat getInstance() {
             return auto;
+        }
+
+        public void setInstance() {
+            auto = this;
         }
 
         @Override
@@ -37,11 +46,8 @@ public class SB {
         }
 
         private static class AutoChooser implements Loggable {
+            @Log.Exclude
             private static AutoChooser m_autoChooser = new AutoChooser();
-
-            private AutoChooser() {
-                Logger.configureLoggingAndConfig(this, false);
-            }
 
             public static AutoChooser getInstance() {
                 return m_autoChooser;
@@ -94,9 +100,16 @@ public class SB {
             public LayoutType configureLayoutType() {
                 return BuiltInLayouts.kList;
             }
+
+            // Oblog Config
+            @Override
+            public boolean skipLayout() {
+                return true;
+            }
         }
 
         private static class WaitTimes implements Loggable {
+            @Log.Exclude
             private static WaitTimes waitTimes = new WaitTimes();
 
             private WaitTimes() {
@@ -125,7 +138,8 @@ public class SB {
                 return wait3;
             }
 
-            // Oblog Layout Config
+            // Oblog Config
+            
             @Override
             public String configureLogName() {
                 return "Wait Time";
@@ -133,7 +147,7 @@ public class SB {
 
             @Override
             public int[] configureLayoutPosition() {
-                return new int[] { 0, 2 };
+                return new int[] { 2, 0 };
             }
 
             @Override
@@ -150,7 +164,7 @@ public class SB {
         @Log(name = "Chosen Auto", rowIndex = 2, columnIndex = 0, width = 3, height = 1)
         private String chosenAuto = "Do Nothing";
 
-        private boolean push = false;
+        private boolean pushing = false;
 
         private final String[] startingPos = { "Power Port Wall", "Power Port", "Center", "Feeder Station",
                 "Feeder Station Wall" },
@@ -162,7 +176,10 @@ public class SB {
         private AutoChooser autoChooser = AutoChooser.getInstance();
         private WaitTimes waitTimes = WaitTimes.getInstance();
 
-        private AutonDat() {
+        public AutoDat() {
+            if(auto != null)
+                throw new RuntimeException("Only one instance of Auto can be created");
+                
             if(!DriverStation.getInstance().isFMSAttached()) {
                 // Put in test autos
             }
@@ -196,7 +213,7 @@ public class SB {
         }
 
         public void periodic() {
-            chosenAuto = (getPushing() ? "Push then " : "") + startingPos[autoChooser.getPosition()] + " " + routines[autoChooser.getRoutine()];
+            chosenAuto = (pushing ? "Push then " : "") + startingPos[autoChooser.getPosition()] + " " + routines[autoChooser.getRoutine()];
         }
 
         public double getWait1() {
@@ -212,7 +229,7 @@ public class SB {
         }
 
         public boolean getPushing() {
-            return push;
+            return pushing;
         }
 
         public int getStartingPosition() {
@@ -224,14 +241,15 @@ public class SB {
         }
 
         @Config.ToggleSwitch(name = "Push another bot?", rowIndex = 3, columnIndex = 1, width = 2, height = 1)
-        private void setPush(boolean push) {
-            this.push = push;
+        private void setPush(boolean pushing) {
+            this.pushing = pushing;
         }
     }
 
     public static class LightingDat implements Loggable {
+        @Log.Exclude
         private static LightingDat lighting = new LightingDat();
-
+        
         public static LightingDat getInstance() {
             return lighting;
         }
@@ -241,7 +259,6 @@ public class SB {
         private boolean frozen = false;
 
         private LightingDat() {
-            Logger.configureLoggingAndConfig(this, false);
         }
 
         public int getMode() {
@@ -263,17 +280,23 @@ public class SB {
     }
 
     public static class Cameras implements Loggable {
+        @Log.Exclude
         private static Cameras cameras = new Cameras();
 
         public static Cameras getInstance() {
             return cameras;
         }
 
-        @Log.CameraStream
-        private VideoSource cam1 = CameraServer.getInstance().startAutomaticCapture(0), cam2 = CameraServer.getInstance().startAutomaticCapture(1);
         
+        @Log.CameraStream(rowIndex = 0, columnIndex = 0, width = 4, height = 4)
+        private VideoSource cam1 = CameraServer.getInstance().startAutomaticCapture(0);
+        @Log.CameraStream(rowIndex = 0, columnIndex = 4, width = 4, height = 4)
+        private VideoSource cam2 = CameraServer.getInstance().startAutomaticCapture(1);
+        
+
+
         private Cameras() {
-            Logger.configureLogging(this);
+            //Logger.configureLogging(this);
 
             cam1.setFPS(20);
             cam1.setResolution(320, 240);
