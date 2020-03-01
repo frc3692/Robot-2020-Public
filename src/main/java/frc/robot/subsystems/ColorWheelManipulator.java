@@ -49,8 +49,10 @@ public class ColorWheelManipulator extends SubsystemBase {
     m_matcher.addColorMatch(kYellowTarget);
 
     m_wheelMotor.restoreFactoryDefaults();
+    m_wheelMotor.clearFaults();
     m_wheelMotor.setMotorType(MotorType.kBrushless);
     m_wheelMotor.setIdleMode(IdleMode.kBrake);
+    m_wheelMotor.setSmartCurrentLimit(40);
 
     m_wheelPID.setP(ColorWheelConstants.kP);
     m_wheelPID.setI(ColorWheelConstants.kI);
@@ -59,6 +61,16 @@ public class ColorWheelManipulator extends SubsystemBase {
     m_wheelPID.setOutputRange(-0.35, 0.35);
 
     m_wheelPID.setFF(ColorWheelConstants.kFF);
+
+    m_liftMotor.restoreFactoryDefaults();
+    m_liftMotor.clearFaults();
+    m_liftMotor.setMotorType(MotorType.kBrushless);
+    m_liftMotor.setIdleMode(IdleMode.kBrake);
+    m_liftMotor.setSmartCurrentLimit(40);
+    m_liftMotor.setInverted(true);
+
+    m_wheelMotor.burnFlash();
+    m_liftMotor.burnFlash();
   }
 
   @Override
@@ -91,13 +103,8 @@ public class ColorWheelManipulator extends SubsystemBase {
   }
 
   public void setWheel(double speed) {
-    // if(speed == 0) {
-    // m_wheelMotor.set(0);
-    // } else {
     m_wheelPID.setReference(speed * ColorWheelConstants.kMotorSpeed, ControlType.kVelocity, 0,
         ColorWheelConstants.kFeedforward.calculate(speed));
-    // }
-    SmartDashboard.putNumber("Setpoint", speed * ColorWheelConstants.kMotorSpeed);
   }
 
   public void spin(boolean reversed) {
