@@ -114,7 +114,7 @@ public class RobotContainer implements Loggable {
         () -> m_mechanismController.getRawAxis(DSAxis.kRX, true), m_colorWheelManipulator));
 
     // Configure Buttons
-    m_mechanismController.getBtn(DSButton.kTri).whileHeld(m_mechanismController.getDualModeCommand(
+    m_mechanismController.getBtn(DSButton.kTri).whenHeld(m_mechanismController.getDualModeCommand(
         new RotationControl(m_colorWheelManipulator), new PositionControl(m_colorWheelManipulator)));
 
     // Configure Intake
