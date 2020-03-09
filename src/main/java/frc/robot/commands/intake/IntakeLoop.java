@@ -33,7 +33,15 @@ public class IntakeLoop extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_intake.set(m_speed.getAsDouble());
+    double speed = m_speed.getAsDouble();
+    if(speed == 2) {
+      speed = 1;
+    } else if(speed == -2) {
+      speed = -1;
+    } else {
+      speed = 0;
+    }
+    m_intake.set(speed);
   }
 
   // Called once the command ends or is interrupted.
