@@ -7,6 +7,7 @@
 
 package frc.robot.subsystems;
 
+import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.ColorMatch;
@@ -21,11 +22,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ColorWheelConstants;
-import io.github.oblarg.oblog.annotations.Log;
+import frc.robot.singleton.SB;
 
 public class ColorWheelManipulator extends SubsystemBase {
   private CANSparkMax m_liftMotor = new CANSparkMax(ColorWheelConstants.kLiftMotor, MotorType.kBrushless);
   private CANSparkMax m_wheelMotor = new CANSparkMax(ColorWheelConstants.kWheelMotor, MotorType.kBrushless);
+  private CANEncoder m_wheelEnc = m_wheelMotor.getEncoder();
   private CANPIDController m_wheelPID = m_wheelMotor.getPIDController();
 
   private ColorSensorV3 m_colorSensor = new ColorSensorV3(Port.kOnboard);
@@ -36,8 +38,8 @@ public class ColorWheelManipulator extends SubsystemBase {
   private final Color kRedTarget = ColorMatch.makeColor(0.561, 0.232, 0.114);
   private final Color kYellowTarget = ColorMatch.makeColor(0.361, 0.524, 0.113);
 
-  @Log
   private String colorString = "";
+
 
   /**
    * Creates a new ColorWheelActuator.
@@ -76,7 +78,7 @@ public class ColorWheelManipulator extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    if (m_colorSensor.getProximity() < 1500) {
+    if (m_colorSensor.getProximity() > 190) {
       Color detectedColor = m_colorSensor.getColor();
 
       ColorMatchResult match = m_matcher.matchClosestColor(detectedColor);
@@ -95,6 +97,8 @@ public class ColorWheelManipulator extends SubsystemBase {
     } else {
       colorString = "Not in range";
     }
+
+    SB.Cameras.getInstance().update(colorString);
   }
 
   public void setLift(double speed) {
@@ -108,11 +112,17 @@ public class ColorWheelManipulator extends SubsystemBase {
   }
 
   public void spin(boolean reversed) {
-    double setpoint = reversed ? ColorWheelConstants.kMotorSpeed : -ColorWheelConstants.kMotorSpeed;
-    m_wheelPID.setReference(setpoint, ControlType.kVelocity, 0, ColorWheelConstants.kFeedforward.calculate(setpoint));
-  }
+    double speed = reversed ? -1 : 1;
+
+    m_wheelPID.setReference(ColorWheelConstants.kMotorSpeed, ControlType.kVelocity, 0,
+        ColorWheelConstants.kFeedforward.calculate(speed));
+   }
 
   public double getWheelPos() {
-    return m_wheelMotor.getEncoder().getPosition();
+    return m_wheelEnc.getPosition();
+  }
+
+  public int getProximity() {
+    return m_colorSensor.getProximity();
   }
 }

@@ -68,7 +68,8 @@ public class Robot extends TimedRobot {
     //Lighting.getInstance().update();
 
     // Update shuffleboard
-    //Logger.updateEntries();
+    m_robotContainer.updateShuffleboard();
+    Logger.updateEntries();
   }
 
   /**

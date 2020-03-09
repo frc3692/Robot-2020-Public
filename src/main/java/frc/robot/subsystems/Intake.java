@@ -26,6 +26,7 @@ public class Intake extends SubsystemBase {
     m_motor.setMotorType(MotorType.kBrushless);
     m_motor.setSmartCurrentLimit(40);
     m_motor.setIdleMode(IdleMode.kBrake);
+    m_motor.setInverted(true);
 
     m_motor.burnFlash();
   }

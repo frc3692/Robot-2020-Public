@@ -27,7 +27,7 @@ import io.github.oblarg.oblog.annotations.Config;
 public class SB {
     private SB() {
     }
-    
+
     public static class AutoDat implements Loggable {
         @Log.Exclude
         private static AutoDat auto = new AutoDat();
@@ -52,9 +52,10 @@ public class SB {
             public static AutoChooser getInstance() {
                 return m_autoChooser;
             }
-            
+
             @Log
-            private final SendableChooser<Integer> positionChooser = new SendableChooser<>(), routineChooser = new SendableChooser<>();
+            private final SendableChooser<Integer> positionChooser = new SendableChooser<>(),
+                    routineChooser = new SendableChooser<>();
 
             public void setDefaultPosition(String key, int value) {
                 positionChooser.setDefaultOption(key, value);
@@ -88,12 +89,12 @@ public class SB {
 
             @Override
             public int[] configureLayoutPosition() {
-                return new int[] {0, 0};
+                return new int[] { 0, 0 };
             }
 
             @Override
             public int[] configureLayoutSize() {
-                return new int[] {2, 2};
+                return new int[] { 2, 2 };
             }
 
             @Override
@@ -139,7 +140,7 @@ public class SB {
             }
 
             // Oblog Config
-            
+
             @Override
             public String configureLogName() {
                 return "Wait Time";
@@ -177,10 +178,7 @@ public class SB {
         private WaitTimes waitTimes = WaitTimes.getInstance();
 
         public AutoDat() {
-            if(auto != null)
-                throw new RuntimeException("Only one instance of Auto can be created");
-                
-            if(!DriverStation.getInstance().isFMSAttached()) {
+            if (!DriverStation.getInstance().isFMSAttached()) {
                 // Put in test autos
             }
 
@@ -191,8 +189,7 @@ public class SB {
             autoChooser.addPosition("Center", 2);
             autoChooser.addPosition("Feeder Station", 3);
             autoChooser.setDefaultPosition("Feeder Station Wall", 4);
-            
-            
+
             /*autoChooser.addRoutine("Steal 2, Score Trench, and Generator Switch (15 Balls) (Feeder Station Only)", 0);
             autoChooser.addRoutine("Steal Trench, Score Trench, and Generator Switch (15 Balls) (Feeder Station Only & No Preload)", 1);
             autoChooser.addRoutine("Score Trench and Generator Switch (13 Balls) ", 2);
@@ -208,12 +205,17 @@ public class SB {
             autoChooser.addRoutine("Everybot (0 Balls)", 12);*/
             autoChooser.addRoutine("Drive from initiation line", 13);
             autoChooser.addRoutine("Simple Score (only from Power Port)", 14);
-            autoChooser.addRoutine("Spin (This auto is a joke, do not choose it unless you don't want to score any points)", 15); // I'm leaving this in
+            autoChooser.addRoutine(
+                    "Spin (This auto is a joke, do not choose it unless you don't want to score any points)", 15); // I'm
+                                                                                                                   // leaving
+                                                                                                                   // this
+                                                                                                                   // in
             autoChooser.setDefaultRoutine("Do Nothing", 16);
         }
 
         public void periodic() {
-            chosenAuto = (pushing ? "Push then " : "") + startingPos[autoChooser.getPosition()] + " " + routines[autoChooser.getRoutine()];
+            chosenAuto = (pushing ? "Push then " : "") + startingPos[autoChooser.getPosition()] + " "
+                    + routines[autoChooser.getRoutine()];
         }
 
         public double getWait1() {
@@ -249,7 +251,7 @@ public class SB {
     public static class LightingDat implements Loggable {
         @Log.Exclude
         private static LightingDat lighting = new LightingDat();
-        
+
         public static LightingDat getInstance() {
             return lighting;
         }
@@ -287,22 +289,45 @@ public class SB {
             return cameras;
         }
 
-        
         @Log.CameraStream(rowIndex = 0, columnIndex = 0, width = 4, height = 4)
         private VideoSource cam1 = CameraServer.getInstance().startAutomaticCapture(0);
-        @Log.CameraStream(rowIndex = 0, columnIndex = 4, width = 4, height = 4)
+        @Log.CameraStream(rowIndex = 0, columnIndex = 5, width = 4, height = 4)
         private VideoSource cam2 = CameraServer.getInstance().startAutomaticCapture(1);
-        
-
+        @Log(name = "Target Color", rowIndex = 1, columnIndex = 4, width = 1, height = 1)
+        private String targetColor = "None";
+        @Log(name = "Detected Color", rowIndex = 2, columnIndex = 4, width = 1, height = 1)
+        private String colorString = "Not in range";
 
         private Cameras() {
-            //Logger.configureLogging(this);
+            // Logger.configureLogging(this);
 
             cam1.setFPS(20);
             cam1.setResolution(320, 240);
 
             cam2.setFPS(20);
             cam2.setResolution(320, 240);
+        }
+
+        public void update(String colorString) {
+            this.colorString = colorString;
+            if (targetColor.charAt(0) == 'N' && DriverStation.getInstance().getGameSpecificMessage().length() > 0) {
+                switch (DriverStation.getInstance().getGameSpecificMessage().charAt(0)) {
+                    case 'r':
+                        targetColor = "Red";
+                        break;
+                    case 'g':
+                        targetColor = "Green";
+                        break;
+                    case 'b':
+                        targetColor = "Blue";
+                        break;
+                    case 'y':
+                        targetColor = "Yellow";
+                        break;
+                    default:
+                        break;
+                }
+            }
         }
     }
 }

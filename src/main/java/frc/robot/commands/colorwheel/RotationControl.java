@@ -9,6 +9,7 @@ package frc.robot.commands.colorwheel;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.ColorWheelManipulator;
+import frc.robot.util.Debug;
 
 public class RotationControl extends CommandBase {
   private ColorWheelManipulator m_colorwheel;
@@ -18,24 +19,25 @@ public class RotationControl extends CommandBase {
    * Creates a new PositionControl.
    */
   public RotationControl(ColorWheelManipulator colorwheel) {
-    //rev = SB.ColorWheel.getInstance().getInverted();
-    if(rev)
-      target = -198.4 + colorwheel.getWheelPos();
-    else
-      target = 198.4 + colorwheel.getWheelPos();
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(colorwheel);
+    m_colorwheel = colorwheel;
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+  if(rev)
+    target = -189 + m_colorwheel.getWheelPos(); // 3.5 rotations, wheels seem to slip
+  else
+    target = 189 + m_colorwheel.getWheelPos();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
     m_colorwheel.spin(rev);
+    Debug.log("POS - " + m_colorwheel.getWheelPos() + "| Target - " + target);
   }
 
   // Called once the command ends or is interrupted.

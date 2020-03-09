@@ -9,41 +9,47 @@ package frc.robot;
 
 import java.util.Map;
 
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.controller.RamseteController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.commands.auto.DriveDistance;
-import frc.robot.commands.auto.SimpleScore;
+import frc.robot.commands.auto.DriveStraight;
 import frc.robot.commands.auto.ScoreAndRun;
 import frc.robot.commands.auto.ScoreAndRunWide;
-import frc.robot.commands.auto.SimpleDriveDist;
+import frc.robot.commands.auto.SimpleScore;
 import frc.robot.commands.auto.Spin;
 import frc.robot.commands.colorwheel.ColorLoop;
 import frc.robot.commands.colorwheel.PositionControl;
 import frc.robot.commands.colorwheel.RotationControl;
 import frc.robot.commands.drive.ArcadeDrive;
 import frc.robot.commands.intake.IntakeLoop;
+import frc.robot.commands.lift.ExtendLift;
 import frc.robot.commands.lift.WinchLoop;
 import frc.robot.singleton.SB;
 import frc.robot.singleton.SB.AutoDat;
 import frc.robot.singleton.SB.Cameras;
 import frc.robot.singleton.SB.LightingDat;
+import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.ColorWheelManipulator;
+import frc.robot.subsystems.Drivetrain;
+import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Lift;
 import frc.robot.util.DS4;
-import frc.robot.util.RobotState;
 import frc.robot.util.DS4.DSAxis;
 import frc.robot.util.DS4.DSButton;
+import frc.robot.util.RobotState;
 import frc.robot.util.RobotState.State;
 import frc.robot.util.pneumatics.SolState;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.Logger;
-import frc.robot.subsystems.Arm;
-import frc.robot.subsystems.Lift;
-import frc.robot.subsystems.ColorWheelManipulator;
-import frc.robot.subsystems.Drivetrain;
-import frc.robot.subsystems.Intake;
+import io.github.oblarg.oblog.annotations.Log;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -53,10 +59,13 @@ import frc.robot.subsystems.Intake;
  * commands, and button mappings) should be declared here.
  */
 public class RobotContainer implements Loggable {
-  //private AutoDat autoDat = new AutoDat();
-  //private LightingDat lightingDat = LightingDat.getInstance();
-  //private Cameras cameras = Cameras.getInstance();
-  
+  @SuppressWarnings("unused")
+  private AutoDat autoDat = AutoDat.getInstance();
+  @SuppressWarnings("unused")
+  private LightingDat lightingDat = LightingDat.getInstance();
+  @SuppressWarnings("unused")
+  private Cameras cameras = Cameras.getInstance();
+
   public static class Config {
     public static boolean Inverted = false;
 
@@ -72,16 +81,16 @@ public class RobotContainer implements Loggable {
   private final Drivetrain m_drivetrain = new Drivetrain();
   private final ColorWheelManipulator m_colorWheelManipulator = new ColorWheelManipulator();
 
-  // Sensors
-  private final DS4 m_driveController = new DS4(0, 0.03);
-  private final DS4 m_mechanismController = new DS4(1, 0.03);
-
+  // Controllers
+  private final DS4 m_driveController = new DS4(0, 0.05);
+  private final DS4 m_mechanismController = new DS4(1, 0.05);
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
+    Logger.configureLoggingAndConfig(this, false);
   }
 
   /**
@@ -115,7 +124,7 @@ public class RobotContainer implements Loggable {
 
     // Configure Buttons
     m_mechanismController.getBtn(DSButton.kTri).whenHeld(m_mechanismController.getDualModeCommand(
-        new RotationControl(m_colorWheelManipulator), new PositionControl(m_colorWheelManipulator)));
+        new RotationControl(m_colorWheelManipulator), new PositionControl(m_colorWheelManipulator)), false);
 
     // Configure Intake
     // Configure Axis
@@ -130,25 +139,24 @@ public class RobotContainer implements Loggable {
         .whenReleased(() -> m_arm.hold(false), m_arm);
 
     m_mechanismController.getBtn(DSButton.kUp).whenPressed(
-        getStateDependantCommand(new InstantCommand(() -> m_arm.setSetpoint(1), m_arm), new InstantCommand(() -> {
+        getStateDependantCommand(new InstantCommand(() -> m_arm.setSetpoint(1), m_arm), new ExtendLift(m_lift)));
+
+    m_mechanismController.getBtn(DSButton.kDown).whenPressed(
+        getStateDependantCommand(new InstantCommand(() -> m_arm.setSetpoint(-1), m_arm), new InstantCommand(() -> {
           if (m_lift.getStage2State() == SolState.kFwd) {
             m_lift.disengageStage2();
           } else {
             m_lift.disengageStage1();
           }
-        }, m_lift)));
-
-    m_mechanismController.getBtn(DSButton.kDown).whenPressed(
-        getStateDependantCommand(new InstantCommand(() -> m_arm.setSetpoint(-1), m_arm), new InstantCommand(() -> {
-          if (m_lift.getStage1State() == SolState.kFwd) {
-            m_lift.engageStage2();
-          } else {
-            m_lift.engageStage1();
+        }, m_lift))).whenHeld(m_mechanismController.getDualModeCommand(new InstantCommand(), new RunCommand(() -> {
+          if (!DriverStation.getInstance().isFMSAttached()) {
+            m_lift.rewindWinch();
           }
         }, m_lift)));
 
     m_mechanismController.getBtn(DSButton.kPS)
-        .whenPressed(getStateDependantCommand(new InstantCommand(() -> m_lift.initEndgame(m_arm), m_lift, m_arm),
+        .whenPressed(getStateDependantCommand(
+            new InstantCommand(() -> m_lift.initEndgame(m_arm), m_lift, m_arm).andThen(new ExtendLift(m_lift)),
             new InstantCommand(() -> m_lift.undoEndgame(m_arm), m_lift, m_arm)));
   }
 
@@ -209,14 +217,17 @@ public class RobotContainer implements Loggable {
 
         break;
       case 13:
-        autonCommand = new SimpleDriveDist(DriveConstants.kFrameLength, DriveConstants.kAutoSpeed, m_drivetrain);
+        autonCommand = new DriveStraight(DriveConstants.kAutoSpeed, m_drivetrain).withTimeout(3);
         break;
       case 14:
         autonCommand = new SimpleScore(SB.AutoDat.getInstance().getStartingPosition(), m_drivetrain, m_intake, m_arm);
         break;
       case 15: // Why
-        autonCommand = new Spin(0.5, m_drivetrain);
+        autonCommand = new Spin(0.1, m_drivetrain);
         break;
+
+      case 16:
+
     }
 
     autonCommand = wait1.andThen(autonCommand);
@@ -234,9 +245,13 @@ public class RobotContainer implements Loggable {
     m_drivetrain.stop();
   }
 
-    // Oblog
-    @Override
-    public String configureLogName() {
-      return "Diagnostics";
-    }
+  public void updateShuffleboard() {
+    // Used for debugging
+  }
+
+  // Oblog
+  @Override
+  public String configureLogName() {
+    return "Diagnostics";
+  }
 }

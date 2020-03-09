@@ -46,7 +46,7 @@ public class DS4 extends Joystick implements AutoCloseable {
 	}
 
 	public static enum DSAxis {
-		kLX(0), kLY(1), kRX(2), kRT(3), kLT(4), kRY(5);
+		kLX(0), kLY(1), kRX(2), kLT(3), kRT(4), kRY(5);
 
 		private int id;
 

@@ -9,6 +9,7 @@ package frc.robot.commands.lift;
 
 import java.util.function.DoubleSupplier;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.util.RobotState;
 import frc.robot.util.RobotState.State;
@@ -36,7 +37,13 @@ public class WinchLoop extends CommandBase {
   @Override
   public void execute() {
     if(RobotState.getState() == State.kEndgame) {
-      m_lift.runWinch(m_speed.getAsDouble());
+      if(DriverStation.getInstance().isFMSAttached()) {
+        m_lift.runWinch(-Math.abs(m_speed.getAsDouble()));
+      } else {
+        m_lift.runWinch(m_speed.getAsDouble());
+      }
+    } else {
+      m_lift.runWinch(0);
     }
   }
 

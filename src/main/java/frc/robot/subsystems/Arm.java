@@ -28,6 +28,7 @@ public class Arm extends SubsystemBase {
   public Arm() {
     m_motor.restoreFactoryDefaults();
     m_motor.clearFaults();
+    m_motor.setMotorType(MotorType.kBrushless);
     m_motor.setIdleMode(IdleMode.kBrake);
 
     m_motor.burnFlash();
@@ -56,6 +57,8 @@ public class Arm extends SubsystemBase {
       } else if (setpoint > 0 && m_enc.get() > ArmConstants.kSpringPos) {
         // Lifted
         speed = 0;
+      } else if(setpoint > 0 && m_enc.get() > ArmConstants.kUpPos) {
+        speed = ArmConstants.kLiftSpeed;
       } else if (setpoint < 0 && m_enc.get() > ArmConstants.kFallPos) {
         // At the top and going down
         speed = ArmConstants.kDropSpeed;
