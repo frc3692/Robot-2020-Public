@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
+import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.commands.arm.ArmScore;
 import frc.robot.subsystems.Arm;
@@ -23,12 +24,12 @@ public class SimpleScore extends CommandBase {
   public SimpleScore(int startingPos, Drivetrain dt, Intake intake, Arm arm) {
     switch (startingPos) {
       case 1:
-        m_autonCommand = new SimpleDriveDist(3.25 - (DriveConstants.kFrameLength/2), DriveConstants.kAutoSpeed, dt)
+        m_autonCommand = new DriveStraight(DriveConstants.kAutoSpeed, dt).withTimeout(10).withInterrupt(() -> arm.getPosition() < ArmConstants.kUpPos)
             .raceWith(new StartEndCommand(() -> arm.hold(true), () -> arm.hold(false), arm)).andThen(new ArmScore(arm))
-            .andThen(new RunCommand(() -> intake.out(), intake).withTimeout(1));
+            .andThen(new RunCommand(() -> intake.out(), intake).withTimeout(4));
         break;
       default:
-        m_autonCommand = new SimpleDriveDist(DriveConstants.kFrameLength, DriveConstants.kAutoSpeed, dt);
+        m_autonCommand = new DriveStraight(DriveConstants.kAutoSpeed, dt).withTimeout(3);
     }
   }
 
