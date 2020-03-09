@@ -33,7 +33,7 @@ public final class Constants {
         /** Wheel circumference in meters */
         public static final double kWheelCirc = 0.1524 /* 6 in */ * Math.PI;
         /** Gear ratio of the toughbox mini */
-        public static final double kGearRatio = 12.75;
+        public static final double kGearRatio = 10.75;
         /** Frame width in meters (includes bumpers) */
         public static final double kFrameWidth = 0.9144; // 36 in
         /** Frame length in meters (includes bumpers) */
@@ -46,7 +46,7 @@ public final class Constants {
         public static final double kEncDPR = kWheelCirc / kGearRatio;
 
         // Auto
-        public static final double kAutoSpeed = 0.5;
+        public static final double kAutoSpeed = 0.25;
         // TODO: Find max accel and vel
         public static final double kMaxAccel = 6;
         public static final double kMaxVel = 3;
