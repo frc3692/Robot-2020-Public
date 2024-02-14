@@ -11,6 +11,7 @@ import java.util.Map;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.controller.RamseteController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -18,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.button.Button;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.commands.auto.DriveDistance;
 import frc.robot.commands.auto.DriveStraight;
@@ -49,7 +51,6 @@ import frc.robot.util.RobotState.State;
 import frc.robot.util.pneumatics.SolState;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.Logger;
-import io.github.oblarg.oblog.annotations.Log;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -84,6 +85,8 @@ public class RobotContainer implements Loggable {
   // Controllers
   private final DS4 m_driveController = new DS4(0, 0.05);
   private final DS4 m_mechanismController = new DS4(1, 0.05);
+
+  private final Button m_userBtn = new Button(() -> RobotController.getUserButton());
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
@@ -158,6 +161,8 @@ public class RobotContainer implements Loggable {
         .whenPressed(getStateDependantCommand(
             new InstantCommand(() -> m_lift.initEndgame(m_arm), m_lift, m_arm).andThen(new ExtendLift(m_lift)),
             new InstantCommand(() -> m_lift.undoEndgame(m_arm), m_lift, m_arm)));
+
+    m_userBtn.whenPressed(() -> m_lift.toggleWinchMode());
   }
 
   private Command getStateDependantCommand(Command auto, Command telop, Command endgame) {
@@ -172,7 +177,7 @@ public class RobotContainer implements Loggable {
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
+   * Couldn't get PathWeaver working in time, drive straight and simplescore are the only functional routes
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
@@ -203,12 +208,12 @@ public class RobotContainer implements Loggable {
 
         break;
       case 9: // Score and Run
-        autonCommand = new ScoreAndRun(SB.AutoDat.getInstance().getStartingPosition(), controller, m_drivetrain,
-            m_intake, m_arm);
+        //autonCommand = new ScoreAndRun(SB.AutoDat.getInstance().getStartingPosition(), controller, m_drivetrain,
+        //    m_intake, m_arm);
         break;
       case 10: // Score and Run Wide
-        autonCommand = new ScoreAndRunWide(SB.AutoDat.getInstance().getStartingPosition(), controller, m_drivetrain,
-            m_intake, m_arm);
+        //autonCommand = new ScoreAndRunWide(SB.AutoDat.getInstance().getStartingPosition(), controller, m_drivetrain,
+        //    m_intake, m_arm);
         break;
       case 11:
 

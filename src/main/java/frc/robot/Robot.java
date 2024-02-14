@@ -12,10 +12,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.singleton.Lighting;
 import frc.robot.singleton.SB;
-import frc.robot.util.Debug;
 import frc.robot.util.RobotState;
 import frc.robot.util.RobotState.State;
-import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.Logger;
 
 /**
@@ -40,12 +38,10 @@ public class Robot extends TimedRobot {
     // and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
-    //Logger.configureLoggingAndConfig(this, false);
-    //Logger.setCycleWarningsEnabled(false);
   }
 
-  /**
-   * This function is called every robot packet, no matter the mode. Use this for
+  /**\
+  8 * This function is called every robot packet, no matter the mode. Use this for
    * items like diagnostics that you want ran during disabled, autonomous,
    * teleoperated and test.
    *
@@ -65,7 +61,7 @@ public class Robot extends TimedRobot {
     CommandScheduler.getInstance().run();
 
     // Update lighting
-    //Lighting.getInstance().update();
+    Lighting.getInstance().update();
 
     // Update shuffleboard
     m_robotContainer.updateShuffleboard();
@@ -91,7 +87,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
-    RobotState.updateState(State.kAuto);
+    RobotState.updateState(State.kAuto)
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)

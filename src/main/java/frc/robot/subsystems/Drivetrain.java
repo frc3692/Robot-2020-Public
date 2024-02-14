@@ -22,14 +22,10 @@ import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpiutil.math.MathUtil;
 import frc.robot.singleton.Gyro;
-import io.github.oblarg.oblog.annotations.Log;
 import frc.robot.RobotContainer;
 import frc.robot.Constants.DriveConstants;
 
 public class Drivetrain extends SubsystemBase {
-  /**
-   * Creates a new Drivetrain.
-   */
   private final CANSparkMax m_frontLeft = new CANSparkMax(DriveConstants.kFrontLeft, MotorType.kBrushless);
   private final CANSparkMax m_backLeft = new CANSparkMax(DriveConstants.kBackLeft, MotorType.kBrushless);
   private final CANSparkMax m_frontRight = new CANSparkMax(DriveConstants.kFrontRight, MotorType.kBrushless);
@@ -50,6 +46,9 @@ public class Drivetrain extends SubsystemBase {
 
   private double m_leftSetpoint = 0, m_rightSetpoint = 0;
 
+    /**
+   * Creates a new Drivetrain.
+   */
   public Drivetrain() {
 
     m_drive.setDeadband(0.1);
@@ -59,6 +58,10 @@ public class Drivetrain extends SubsystemBase {
 
     m_rightEncoder.setPositionConversionFactor(DriveConstants.kEncDPR); // m
     m_rightEncoder.setVelocityConversionFactor(DriveConstants.kEncDPR / 60); // m/s
+
+    // Reset Encoders
+    m_leftEncoder.setPosition(0);
+    m_rightEncoder.setPosition(0);
 
     m_frontLeft.restoreFactoryDefaults();
     m_frontRight.restoreFactoryDefaults();

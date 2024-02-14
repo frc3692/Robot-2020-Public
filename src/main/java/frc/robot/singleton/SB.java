@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 
 import io.github.oblarg.oblog.Loggable;
-import io.github.oblarg.oblog.Logger;
 import io.github.oblarg.oblog.annotations.Log;
 import io.github.oblarg.oblog.annotations.Config;
 
@@ -30,14 +29,10 @@ public class SB {
 
     public static class AutoDat implements Loggable {
         @Log.Exclude
-        private static AutoDat auto = new AutoDat();
+        private static final AutoDat auto = new AutoDat();
 
         public static AutoDat getInstance() {
             return auto;
-        }
-
-        public void setInstance() {
-            auto = this;
         }
 
         @Override
@@ -47,7 +42,7 @@ public class SB {
 
         private static class AutoChooser implements Loggable {
             @Log.Exclude
-            private static AutoChooser m_autoChooser = new AutoChooser();
+            private static final AutoChooser m_autoChooser = new AutoChooser();
 
             public static AutoChooser getInstance() {
                 return m_autoChooser;
@@ -111,7 +106,7 @@ public class SB {
 
         private static class WaitTimes implements Loggable {
             @Log.Exclude
-            private static WaitTimes waitTimes = new WaitTimes();
+            private static final WaitTimes waitTimes = new WaitTimes();
 
             private WaitTimes() {
             }
@@ -120,11 +115,11 @@ public class SB {
                 return waitTimes;
             }
 
-            @Log(name = "Wait 1")
+            @Config(name = "Wait 1")
             private double wait1 = 0;
-            @Log(name = "Wait 2")
+            @Config(name = "Wait 2")
             private double wait2 = 0;
-            @Log(name = "Wait 3")
+            @Config(name = "Wait 3")
             private double wait3 = 0;
 
             public double getWait1() {
@@ -174,8 +169,8 @@ public class SB {
                         "Score Trench", "Score Generator Switch Balls", "Steal All & Score", "Score and Run",
                         "Score Wide and Run", "Run Only", "Everybot", "Move from Initiation Line", "Simple Score",
                         "Spin", "Do Nothing" };
-        private AutoChooser autoChooser = AutoChooser.getInstance();
-        private WaitTimes waitTimes = WaitTimes.getInstance();
+        private final AutoChooser autoChooser = AutoChooser.getInstance();
+        private final WaitTimes waitTimes = WaitTimes.getInstance();
 
         public AutoDat() {
             if (!DriverStation.getInstance().isFMSAttached()) {
@@ -250,7 +245,7 @@ public class SB {
 
     public static class LightingDat implements Loggable {
         @Log.Exclude
-        private static LightingDat lighting = new LightingDat();
+        private static final LightingDat lighting = new LightingDat();
 
         public static LightingDat getInstance() {
             return lighting;
@@ -258,6 +253,7 @@ public class SB {
 
         @Config(name = "Mode")
         private int mode = 1;
+        @Config(name = "Override")
         private boolean frozen = false;
 
         private LightingDat() {
@@ -290,17 +286,15 @@ public class SB {
         }
 
         @Log.CameraStream(rowIndex = 0, columnIndex = 0, width = 4, height = 4)
-        private VideoSource cam1 = CameraServer.getInstance().startAutomaticCapture(0);
+        private final VideoSource cam1 = CameraServer.getInstance().startAutomaticCapture(0);
         @Log.CameraStream(rowIndex = 0, columnIndex = 5, width = 4, height = 4)
-        private VideoSource cam2 = CameraServer.getInstance().startAutomaticCapture(1);
+        private final VideoSource cam2 = CameraServer.getInstance().startAutomaticCapture(1);
         @Log(name = "Target Color", rowIndex = 1, columnIndex = 4, width = 1, height = 1)
         private String targetColor = "None";
         @Log(name = "Detected Color", rowIndex = 2, columnIndex = 4, width = 1, height = 1)
         private String colorString = "Not in range";
 
         private Cameras() {
-            // Logger.configureLogging(this);
-
             cam1.setFPS(20);
             cam1.setResolution(320, 240);
 
@@ -310,8 +304,9 @@ public class SB {
 
         public void update(String colorString) {
             this.colorString = colorString;
-            if (targetColor.charAt(0) == 'N' && DriverStation.getInstance().getGameSpecificMessage().length() > 0) {
-                switch (DriverStation.getInstance().getGameSpecificMessage().charAt(0)) {
+            String gameString = DriverStation.getInstance().getGameSpecificMessage();
+            if (targetColor.charAt(0) == 'N' && gameString.length() > 0) {
+                switch (gameString.charAt(0)) {
                     case 'r':
                         targetColor = "Red";
                         break;

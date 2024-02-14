@@ -108,7 +108,7 @@ public final class Constants {
 
         public static final double kP = 0.00000528;
         public static final double kI = 0.0000003;
-        public static final double kFF = 0; //0.000087;
+        public static final double kFF = 0;
     }
 
     public static final class LiftConstants {

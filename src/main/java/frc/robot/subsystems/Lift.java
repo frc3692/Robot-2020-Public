@@ -39,7 +39,7 @@ public class Lift extends SubsystemBase implements Loggable {
     m_winch.clearFaults();
     m_winch.setMotorType(MotorType.kBrushless);
     m_winch.setOpenLoopRampRate(0.25);
-    m_winch.setIdleMode(IdleMode.kCoast);
+    m_winch.setIdleMode(IdleMode.kBrake);
 
     stage1.rev();
     stage2.rev();
@@ -83,7 +83,15 @@ public class Lift extends SubsystemBase implements Loggable {
 
   public void rewindWinch() {
       runWinch(.25);
+  }
+
+  public void toggleWinchMode() {
+    if(m_winch.getIdleMode() == IdleMode.kBrake) {
+      m_winch.setIdleMode(IdleMode.kCoast);
+    } else {
+      m_winch.setIdleMode(IdleMode.kBrake);
     }
+  }
 
   public boolean runToPosition(double target, double speed) {
     if(speed > 0) {
